@@ -42,7 +42,7 @@ assign encoder_out = {3{en_encoder_prio}} & encoder_out_buf;
 assign ledr[2 : 0] = encoder_out;
 assign ledr[4] = indicator_out;
 
-assign indicator_out = (encoder_in != 0);
+assign indicator_out = (encoder_in == 0);
 
 assign encoder_out_buf[2] = (encoder_in[7 : 4] != 0);
 assign encoder_out_buf[1] = (encoder_in[7 : 6] == 2'b01) | (encoder_in[7 : 2] == 6'b0000_01);
