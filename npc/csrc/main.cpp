@@ -16,7 +16,10 @@ static void single_cycle() {
 
 static void reset(int n) {
   top->rst = 1;
-  while (n -- > 0) single_cycle();
+  while (n > 0) {
+    single_cycle();
+    n --;
+  }
   top->rst = 0;
 }
 

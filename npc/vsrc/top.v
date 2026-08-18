@@ -23,6 +23,29 @@ module top(
     output [7:0] seg5,
     output [7:0] seg6,
     output [7:0] seg7
+
 );
+
+reg [15 : 0] led_buf;
+assign ledr = led_buf;
+
+reg [23 : 0] cnt_clk;
+always@(posedge clk or posedge rst) begin
+    if (rst)
+        cnt_clk <= 'b0;
+    else if (cnt_clk == 24'd500_000)
+        cnt_clk <= 'b0;
+    else   
+        cnt_clk <= cnt_clk + 'd1;
+end
+
+always@(posedge clk or posedge rst) begin
+    if (rst)
+        led_buf <= 16'b1;
+    else if (cnt_clk == 24'd50_000)
+        led_buf <= {led_buf[14 : 0], led_buf[15]};
+    else   
+        led_buf <= led_buf;
+end
  
 endmodule
