@@ -6,12 +6,12 @@ INC_PATH = cinc/
 VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc  \
 				-O3 --x-assign fast --x-initial fast --noassert
-VERILATOR_BUILD = --cc --exe --build -j 0 
-VERILATOR_WARN = -Wall
-TOP_MODULE = vsrc/top
-TESTBENCH = csrc/main.cpp
-#BUILD_DIR = obj_dir
-EXECUTABLE = $(BUILD_DIR)/V$(TOP_MODULE)
+# VERILATOR_BUILD = --cc --exe --build -j 0 
+# VERILATOR_WARN = -Wall
+# TOP_MODULE = vsrc/top
+# TESTBENCH = csrc/main.cpp
+# #BUILD_DIR = obj_dir
+# EXECUTABLE = $(BUILD_DIR)/V$(TOP_MODULE)
 
 
 BUILD_DIR = ./build
@@ -46,7 +46,8 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
+		--trace-fst
 
 
 all:
@@ -54,15 +55,16 @@ all:
 	default
 
 # 仿真
-sim: $(VSRCS) $(CSRCS) $(NVBOARD_HOME)
+sim: $(BIN)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-
-	$(BIN)
 	@$^
 
 # 	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
 # 	obj_dir/Vtop
+
+run: $(BIN)
+	@$^
 
 # 清理目标
 clean:
