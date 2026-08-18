@@ -6,7 +6,10 @@ module bcd7seg(
 wire b3,b2,b1,b0;
 assign {b3,b2,b1,b0} = b;
 
-MuxKeyWithDefault #(10, 4, 8) i0 (h, b, 8'h00, {
+wire [7 : 0] y;
+assign h = ~y;
+
+MuxKeyWithDefault #(10, 4, 8) i0 (y, b, 8'h00, {
     4'd0, 8'b11111101,
     4'd1, 8'b01100000,
     4'd2, 8'b11011010,
