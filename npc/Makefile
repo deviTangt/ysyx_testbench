@@ -7,13 +7,6 @@ VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc  \
 				-O3 --x-assign fast --x-initial fast --noassert
 VERILATOR_CHECK = --lint-only
-# VERILATOR_BUILD = --cc --exe --build -j 0 
-# VERILATOR_WARN = -Wall
-# TOP_MODULE = vsrc/top
-# TESTBENCH = csrc/main.cpp
-# #BUILD_DIR = obj_dir
-# EXECUTABLE = $(BUILD_DIR)/V$(TOP_MODULE)
-
 
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
