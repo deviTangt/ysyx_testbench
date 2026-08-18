@@ -1,6 +1,7 @@
 # 定义变量
 VERILATOR = verilator
-VERILATOR_BUILD = --cc --exe --build -j 0 -Wall
+VERILATOR_BUILD = --cc --exe --build -j 0 
+VERILATOR_WARN = -Wall
 TOP_MODULE = vsrc/top
 TESTBENCH = csrc/main.cpp
 BUILD_DIR = obj_dir
