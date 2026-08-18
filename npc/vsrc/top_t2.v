@@ -1,35 +1,41 @@
 module top(
-    input clk,
-    input rst,
-    input [4:0] btn,
-    input [15:0] sw,
-    input ps2_clk,
-    input ps2_data,
-    input uart_rx,
-    output uart_tx,
-    output [15:0] ledr,
-    output VGA_CLK,
-    output VGA_HSYNC,
-    output VGA_VSYNC,
-    output VGA_BLANK_N,
-    output [7:0] VGA_R,
-    output [7:0] VGA_G,
-    output [7:0] VGA_B,
-    output [7:0] seg0,
-    output [7:0] seg1,
-    output [7:0] seg2,
-    output [7:0] seg3,
-    output [7:0] seg4,
-    output [7:0] seg5,
-    output [7:0] seg6,
-    output [7:0] seg7
+    input  wire         clk,
+    input  wire         rst,
+
+    input  wire [4:0]   btn,
+    input  wire [15:0]  sw,
+
+    input  wire         ps2_clk,
+    input  wire         ps2_data,
+
+    input  wire         uart_rx,
+    output wire         uart_tx,
+
+    output wire [15:0]  ledr,
+
+    output wire         VGA_CLK,
+    output wire         VGA_HSYNC,
+    output wire         VGA_VSYNC,
+    output wire         VGA_BLANK_N,
+    output wire [7:0]   VGA_R,
+    output wire [7:0]   VGA_G,
+    output wire [7:0]   VGA_B,
+
+    output wire [7:0]   seg0,
+    output wire [7:0]   seg1,
+    output wire [7:0]   seg2,
+    output wire [7:0]   seg3,
+    output wire [7:0]   seg4,
+    output wire [7:0]   seg5,
+    output wire [7:0]   seg6,
+    output wire [7:0]   seg7
 
 );
 
 wire en_encoder_prio = sw[8];
 wire [7 : 0] encoder_in = sw[7 : 0]; 
 
-reg [2 : 0] encoder_out;
+wire [2 : 0] encoder_out;
 wire [2 : 0] encoder_out_buf;
 reg indicator_out;
 assign encoder_out = {3{en_encoder_prio}} & encoder_out_buf;
