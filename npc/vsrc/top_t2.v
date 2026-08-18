@@ -56,7 +56,6 @@ assign encoder_out_buf[0] = (encoder_in[7] == 1'b1) | (encoder_in[7:5] == 3'b001
 // bcd7seg seg3(cpudbgdata[15:12], seg3);
 // bcd7seg seg2(cpudbgdata[11:8], seg2);
 // bcd7seg seg1(cpudbgdata[7:4], seg1);
-bcd7seg ins_seg0(.b({1'b0, encoder_out}), .h(seg0[6 : 0]));
-assign seg0[7] = 1'b0;
+bcd7seg ins_seg0(.b({1'b0, encoder_out}), .h(seg0));
 
 endmodule
