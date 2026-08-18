@@ -8,6 +8,7 @@
 #define VERILATED_VTOP__SYMS_H_  // guard
 
 #include "verilated.h"
+#include "verilated_profiler.h"
 
 // INCLUDE MODEL CLASS
 
@@ -23,6 +24,9 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop__Syms final : public VerilatedSyms {
     Vtop* const __Vm_modelp;
     VlDeleter __Vm_deleter;
     bool __Vm_didInit = false;
+
+    // EXECUTION PROFILING
+    VlExecutionProfiler* const __Vm_executionProfilerp;
 
     // MODULE INSTANCE STATE
     Vtop___024root                 TOP;
