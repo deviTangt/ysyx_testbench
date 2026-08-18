@@ -13,7 +13,7 @@ all:
 sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	$(VERILATOR) $(VERILATOR_BUILD) --trace -Wall $(TESTBENCH) $(TOP_MODULE)
+	$(VERILATOR) $(VERILATOR_BUILD) --trace-fst -Wall $(TESTBENCH) $(TOP_MODULE)
 	obj_dir/Vtop
 
 
