@@ -30,7 +30,7 @@ reg [15 : 0] led_buf;
 assign ledr = led_buf;
 
 reg [23 : 0] cnt_clk;
-localparam CNT_CLK_MAX = 24'd500_000;
+localparam CNT_CLK_MAX = 24'd2_000_000;
 always@(posedge clk or posedge rst) begin
     if (rst)
         cnt_clk <= 'b0;
