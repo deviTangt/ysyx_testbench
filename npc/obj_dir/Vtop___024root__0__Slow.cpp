@@ -37,8 +37,6 @@ VL_ATTR_COLD void Vtop___024root___eval_settle(Vtop___024root* vlSelf) {
     // Locals
     IData/*31:0*/ __VstlIterCount;
     // Body
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPush("loop stl");
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPush loop stl\n"););
     __VstlIterCount = 0U;
     vlSelfRef.__VstlFirstIteration = 1U;
     do {
@@ -52,22 +50,6 @@ VL_ATTR_COLD void Vtop___024root___eval_settle(Vtop___024root* vlSelf) {
         vlSelfRef.__VstlPhaseResult = Vtop___024root___eval_phase__stl(vlSelf);
         vlSelfRef.__VstlFirstIteration = 0U;
     } while (vlSelfRef.__VstlPhaseResult);
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPop loop stl\n"););
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPop();
-}
-
-VL_ATTR_COLD void Vtop___024root___eval_triggers_vec__stl(Vtop___024root* vlSelf) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_triggers_vec__stl\n"); );
-    Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    auto& vlSelfRef = std::ref(*vlSelf).get();
-    // Body
-    vlSelfRef.__VstlTriggered[0U] = ((0xfffffffffffffffeULL 
-                                      & vlSelfRef.__VstlTriggered[0U]) 
-                                     | (IData)((IData)(vlSelfRef.__VstlFirstIteration)));
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPush("trigBase stl");
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPush trigBase stl\n"););
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPop trigBase stl\n"););
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPop();
 }
 
 VL_ATTR_COLD bool Vtop___024root___trigger_anySet__stl(const VlUnpacked<QData/*63:0*/, 1> &in);
@@ -100,23 +82,6 @@ VL_ATTR_COLD bool Vtop___024root___trigger_anySet__stl(const VlUnpacked<QData/*6
     return (0U);
 }
 
-VL_ATTR_COLD void Vtop___024root___eval_stl(Vtop___024root* vlSelf) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_stl\n"); );
-    Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    auto& vlSelfRef = std::ref(*vlSelf).get();
-    // Body
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPush("func stl");
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPush func stl\n"););
-    if ((1ULL & vlSelfRef.__VstlTriggered[0U])) {
-        {
-            // Inlined CFunc: _ico_comb__TOP__0
-            vlSelfRef.f = ((IData)(vlSelfRef.a) ^ (IData)(vlSelfRef.b));
-        }
-    }
-    VL_DEBUG_IF(VL_DBG_MSGF("+    --prof-exec sectionPop func stl\n"););
-    VL_EXEC_TRACE_ADD_RECORD(vlSymsp).sectionPop();
-}
-
 VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vtop___024root___eval_phase__stl\n"); );
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -124,7 +89,12 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
     // Locals
     CData/*0:0*/ __VstlExecute;
     // Body
-    Vtop___024root___eval_triggers_vec__stl(vlSelf);
+    {
+        // Inlined CFunc: _eval_triggers_vec__stl
+        vlSelfRef.__VstlTriggered[0U] = ((0xfffffffffffffffeULL 
+                                          & vlSelfRef.__VstlTriggered[0U]) 
+                                         | (IData)((IData)(vlSelfRef.__VstlFirstIteration)));
+    }
 #ifdef VL_DEBUG
     if (VL_UNLIKELY(vlSymsp->_vm_contextp__->debug())) {
         Vtop___024root___dump_triggers__stl(vlSelfRef.__VstlTriggered, "stl"s);
@@ -132,7 +102,16 @@ VL_ATTR_COLD bool Vtop___024root___eval_phase__stl(Vtop___024root* vlSelf) {
 #endif
     __VstlExecute = Vtop___024root___trigger_anySet__stl(vlSelfRef.__VstlTriggered);
     if (__VstlExecute) {
-        Vtop___024root___eval_stl(vlSelf);
+        {
+            // Inlined CFunc: _eval_stl
+            if ((1ULL & vlSelfRef.__VstlTriggered[0U])) {
+                {
+                    // Inlined CFunc: _ico_comb__TOP__0
+                    vlSelfRef.f = ((IData)(vlSelfRef.a) 
+                                   ^ (IData)(vlSelfRef.b));
+                }
+            }
+        }
     }
     return (__VstlExecute);
 }

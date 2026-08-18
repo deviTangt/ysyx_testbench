@@ -46,7 +46,6 @@ VM_SUPPORT_SLOW += \
 VM_GLOBAL_FAST += \
   verilated \
   verilated_threads \
-  verilated_profiler \
 
 # Global classes, need linked once per executable, non-fast-path, compile with low/medium optimization
 VM_GLOBAL_SLOW += \
