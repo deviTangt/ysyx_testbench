@@ -18,8 +18,11 @@ sim:
 
 
 # 清理目标
- 
 clean:
 	rm -rf $(BUILD_DIR)
+
+# 打开GTK文件
+gtk:
+	gtkwave wave.fst
 
 include ../Makefile
