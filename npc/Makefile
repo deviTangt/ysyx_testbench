@@ -1,6 +1,6 @@
 # 定义变量
 VERILATOR = verilator
-VERILATOR_BUILD = --cc --exe --build -j 0
+VERILATOR_BUILD = --cc --exe --build -j 0 -Wall
 TOP_MODULE = vsrc/top
 TESTBENCH = csrc/main.cpp
 BUILD_DIR = obj_dir
@@ -13,7 +13,7 @@ all:
 sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	$(VERILATOR) $(VERILATOR_BUILD) --trace-fst -Wall $(TESTBENCH) $(TOP_MODULE)
+	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
 	obj_dir/Vtop
 
 
