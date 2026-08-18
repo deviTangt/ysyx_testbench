@@ -6,19 +6,17 @@ module bcd7seg(
 wire b3,b2,b1,b0;
 assign {b3,b2,b1,b0} = b;
 
-// h[0] a段
-assign h[0] = (~b3&~b2&~b1&b0) | (~b3&b2&~b1&~b0) | (b3&~b2&b1&b0) | (b3&b2&~b1&b0);
-// h[1] b段
-assign h[1] = (~b3&b2&~b1&b0) | (~b3&b2&b1&~b0) | (b3&~b2&b1&b0) | (b3&b2&~b1&~b0);
-// h[2] c段
-assign h[2] = (~b3&~b2&b1&~b0) | (b3&b2&~b1&~b0) | (b3&b2&b1&~b0);
-// h[3] d段
-assign h[3] = (~b3&b2&~b1&~b0) | (~b3&~b2&~b1&b0) | (b3&~b2&b1&~b0) | (b3&b2&b1&b0);
-// h[4] e段
-assign h[4] = (~b3&b2&~b1&~b0) | (~b3&~b2&~b1&b0) | (~b3&~b2&b1&b0) | (b3&~b2&~b1&~b0);
-// h[5] f段
-assign h[5] = (~b3&~b2&~b1&b0) | (~b3&~b2&b1&~b0) | (~b3&b2&b1&b0) | (b3&~b2&b1&b0);
-// h[6] g段
-assign h[6] = (~b3&b2&b1&b0) | (b3&~b2&~b1&~b0) | (b3&~b2&b1&b0) | (b3&b2&b1&~b0);
+MuxKeyWithDefault #(10, 4, 7) i0 (h, b, 7'h00, {
+    4'd0, 7'h3F,
+    4'd1, 7'h06,
+    4'd2, 7'h5B,
+    4'd3, 7'h4F,
+    4'd4, 7'h66,
+    4'd5, 7'h6D,
+    4'd6, 7'h7D,
+    4'd7, 7'h07,
+    4'd8, 7'h7F,
+    4'd9, 7'h6F
+  });
 
 endmodule
