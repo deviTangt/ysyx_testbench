@@ -13,7 +13,7 @@ all:
 sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	$(VERILATOR) --cc --exe --build -j 0 --prof-exec -Wall csrc/main.cpp vsrc/top.v
+	$(VERILATOR) $(VERILATOR_FLAGS) --build -j 0 --prof-exec -Wall csrc/main.cpp vsrc/top.v
 	obj_dir/Vtop
 
 
