@@ -17,7 +17,7 @@ sim:
 	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
 	obj_dir/Vtop
 
-	include ../Makefile
+include ../Makefile
 
 
 # 清理目标
