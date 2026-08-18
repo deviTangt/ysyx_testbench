@@ -45,7 +45,8 @@ assign ledr[4] = indicator_out;
 assign indicator_out = (encoder_in == 0);
 
 assign encoder_out_buf[2] = (encoder_in[7 : 4] != 0);
-assign encoder_out_buf[1] = (encoder_in[7 : 6] == 2'b01) | (encoder_in[7 : 2] == 6'b0000_01);
+assign encoder_out_buf[1] = (encoder_in[7]) | (encoder_in[7 : 6] == 2'b01) | 
+                            (encoder_in[7 : 3] == 5'b0000_1) | (encoder_in[7 : 2] == 6'b0000_01);
 assign encoder_out_buf[0] = (encoder_in[7] == 1'b1) | (encoder_in[7 : 5] == 3'b001) |
                             (encoder_in[7 : 3] == 5'b0000_1) | (encoder_in[7 : 1] == 7'b0000_001);
  
