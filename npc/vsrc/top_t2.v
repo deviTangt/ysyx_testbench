@@ -26,27 +26,21 @@ module top(
 
 );
 
-reg [15 : 0] led_buf;
-assign ledr = led_buf;
+wire en_encoder_prio = sw[8];
+wire [7 : 0] encoder_in = sw[7 : 0]; 
 
-reg [23 : 0] cnt_clk;
-localparam CNT_CLK_MAX = 24'd1_000_000;
-always@(posedge clk or posedge rst) begin
-    if (rst)
-        cnt_clk <= 'b0;
-    else if (cnt_clk == CNT_CLK_MAX - 'd1)
-        cnt_clk <= 'b0;
-    else   
-        cnt_clk <= cnt_clk + 'd1;
-end
+reg [2 : 0] encoder_out;
+wire [2 : 0] encoder_out_buf;
+reg indicator_out;
+assign encoder_out = {3{en_encoder_prio}} & encoder_out_buf;
+assign ledr[2 : 0] = encoder_out;
+assign ledr[4] = indicator_out;
 
-always@(posedge clk or posedge rst) begin
-    if (rst)
-        led_buf <= 16'b1;
-    else if (cnt_clk == CNT_CLK_MAX - 'd1)
-        led_buf <= {led_buf[14 : 0], led_buf[15]};
-    else   
-        led_buf <= led_buf;
-end
+assign indicator_out = (encoder_in != 0);
+
+assign encoder_out_buf[2] = (encoder_in[7 : 4] != 0);
+assign encoder_out_buf[1] = (encoder_in[7 : 6] == 2'b01) | (encoder_in[7 : 2] == 6'b0000_01);
+assign encoder_out_buf[0] = (encoder_in[7] == 1'b1) | (encoder_in[7 : 5] == 3'b001) |
+                            (encoder_in[7 : 3] == 5'b0000_1) | (encoder_in[7 : 1] == 7'b0000_001);
  
 endmodule
