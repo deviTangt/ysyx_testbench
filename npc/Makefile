@@ -20,7 +20,6 @@ sim:
 # 清理目标
  
 clean:
-	$(MAKE) -C $(BUILD_DIR) -f V$(TOP_MODULE).mk clean
 	rm -rf $(BUILD_DIR)
 
 include ../Makefile
