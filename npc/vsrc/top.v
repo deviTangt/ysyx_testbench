@@ -42,7 +42,7 @@ end
 always@(posedge clk or posedge rst) begin
     if (rst)
         led_buf <= 16'b1;
-    else if (cnt_clk == 24'd50_000)
+    else if (cnt_clk == 24'd500_000)
         led_buf <= {led_buf[14 : 0], led_buf[15]};
     else   
         led_buf <= led_buf;
