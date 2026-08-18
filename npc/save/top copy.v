@@ -1,4 +1,4 @@
-module top(
+module top_copy(
     input clk,
     input rst,
     input [4:0] btn,

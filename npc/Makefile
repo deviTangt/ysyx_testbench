@@ -6,6 +6,7 @@ INC_PATH = cinc/
 VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc  \
 				-O3 --x-assign fast --x-initial fast --noassert
+VERILATOR_CHECK = --lint-only
 # VERILATOR_BUILD = --cc --exe --build -j 0 
 # VERILATOR_WARN = -Wall
 # TOP_MODULE = vsrc/top
@@ -63,11 +64,16 @@ sim: $(BIN)
 # 	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
 # 	obj_dir/Vtop
 
+# validate check
+check: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CHECK) $^
+
 run: $(BIN)
 	@$^
 
 # 清理目标
-clean:
+clean: 
 	rm -rf $(BUILD_DIR)
 
 # 打开GTK文件
