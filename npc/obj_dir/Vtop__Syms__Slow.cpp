@@ -7,6 +7,7 @@ Vtop__Syms::Vtop__Syms(VerilatedContext* contextp, const char* namep, Vtop* mode
     : VerilatedSyms{contextp}
     // Setup internal state of the Syms class
     , __Vm_modelp{modelp}
+    , __Vm_executionProfilerp{static_cast<VlExecutionProfiler*>(contextp->enableExecutionProfiler(&VlExecutionProfiler::construct))}
     // Setup top module instance
     , TOP{this, namep}
 {
