@@ -33,21 +33,30 @@ module top(
 );
 
 wire en_encoder_prio = sw[8];
-wire [7 : 0] encoder_in = sw[7 : 0]; 
+wire [7:0] encoder_in = sw[7:0]; 
 
-wire [2 : 0] encoder_out;
-wire [2 : 0] encoder_out_buf;
+wire [2:0] encoder_out;
+wire [2:0] encoder_out_buf;
 reg indicator_out;
 assign encoder_out = {3{en_encoder_prio}} & encoder_out_buf;
-assign ledr[2 : 0] = encoder_out;
+assign ledr[2:0] = encoder_out;
 assign ledr[4] = indicator_out;
 
 assign indicator_out = (encoder_in == 0);
 
-assign encoder_out_buf[2] = (encoder_in[7 : 4] != 0);
+assign encoder_out_buf[2] = (encoder_in[7:4] != 0);
 assign encoder_out_buf[1] = (encoder_in[7]) | (encoder_in[7 : 6] == 2'b01) | 
-                            (encoder_in[7 : 3] == 5'b0000_1) | (encoder_in[7 : 2] == 6'b0000_01);
-assign encoder_out_buf[0] = (encoder_in[7] == 1'b1) | (encoder_in[7 : 5] == 3'b001) |
-                            (encoder_in[7 : 3] == 5'b0000_1) | (encoder_in[7 : 1] == 7'b0000_001);
+                            (encoder_in[7:3] == 5'b0000_1) | (encoder_in[7:2] == 6'b0000_01);
+assign encoder_out_buf[0] = (encoder_in[7] == 1'b1) | (encoder_in[7:5] == 3'b001) |
+                            (encoder_in[7:3] == 5'b0000_1) | (encoder_in[7:1] == 7'b0000_001);
  
+//output debuginfo to bcd
+// bcd7seg seg5(cpudbgdata[23:20], seg5);
+// bcd7seg seg4(cpudbgdata[19:16], seg4);
+// bcd7seg seg3(cpudbgdata[15:12], seg3);
+// bcd7seg seg2(cpudbgdata[11:8], seg2);
+// bcd7seg seg1(cpudbgdata[7:4], seg1);
+bcd7seg ins_seg0(.b({1'b0, encoder_out}), .h(seg0[6 : 0]));
+assign seg0[7] = 1'b0;
+
 endmodule
