@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "Vtop.h"
+#include "verilated.h"
 
-int main() {
+int main(int argc, char** argv) {
+
+  VerilatedContext* contextp = new VerilatedContext;
+  contextp->commandArgs(argc, argv);
+  Vtop* top = new Vtop{contextp};
+  
   printf("Hello, ysyx!\n");
   
   int cnt_loop = 0;
-  while (cnt_loop < 20) {
+  while (!contextp->gotFinish() && cnt_loop < 20) {
     int a = rand() & 1;
     int b = rand() & 1;
     top->a = a;
@@ -18,5 +25,7 @@ int main() {
     cnt_loop ++;
   }
 
+  delete top;
+  delete contextp;
   return 0;
 }
