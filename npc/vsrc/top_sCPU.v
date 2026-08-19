@@ -113,6 +113,9 @@ assign din_p1 = type_li ? imm_8b : add_result;
 assign din_p2 = in_sw ? sw_in : din_p1;
 assign din = in_btn ? btn_in : din_p2;
 
+assign raddra = type_bner0 ? 2'd0 : rs1;
+assign raddrb = io_out ? rd : rs2;
+
 //? Instrucions
 assign instrct = rom_PC[PC];
 assign instruct_type = instrct[7:6];
