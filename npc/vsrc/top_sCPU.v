@@ -37,8 +37,8 @@ reg sys_clk;
 wire sys_rst;
 reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
-wire [4:0] btn_pos = ~btn_p & btn;
-// Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
+wire [4:0] btn_neg = btn_p & ~btn;
+// Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_neg[4]);
 assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
 
@@ -159,7 +159,7 @@ bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
 bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
 
 assign sw_in = {4'd0, sw[3:0]};
-assign btn_in = {4'd0, btn[3:0]};
+assign btn_in = {4'd0, btn_neg[3:0]};
 
 //? li
 assign imm_8b = ({6'd0, imm} << s);
@@ -223,7 +223,7 @@ always@(posedge sys_clk) begin
                 $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
                     , "", "", rs2, offset_s, douta, doutb, next_PC);
 
-                $display("bne0 = %1d off_ext = %2d next_PC = %02d", bne0, off_ext_s, next_PC);
+                // $display("bne0 = %1d off_ext = %2d next_PC = %02d", bne0, off_ext_s, next_PC);
             end
         endcase
     end
