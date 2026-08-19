@@ -182,7 +182,9 @@ always@(posedge sys_clk) begin
             $display("PC[%02d] Instruct:%08b Type:%s", PC, instrct, "io");
         end
         2'b10: begin //! li
-            $display("%02d: %08b  %02x  li r%1d %1d << %1d(%1d)"
+            $display("%02d: %08b  %02x  li rd imm << s( )"
+                , PC, instrct, instrct, rd, imm, s, imm << s);
+            $display("%02d: %08b  %02x  li r%1d %3d << %1d(%1d)"
                 , PC, instrct, instrct, rd, imm, s, imm << s);
         end
         2'b11: begin //! bner0
