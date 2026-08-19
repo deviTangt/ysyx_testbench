@@ -171,19 +171,23 @@ bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd1));
 bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
 bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
+wire signed [3:0] offset_s = offset;
 always@(posedge sys_clk) begin
     case(instruct_type)
         2'b00: begin //! add
-            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "add");
+            $display("PC[%02d] Ins:%08b %02x add r%1d r%1d r%1d"
+                , PC, instrct, instrct, rd, rs1, rs2);
         end
         2'b01: begin //! io
-            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "io");
+            $display("PC[%02d] Instruct:%08b Type:%s", PC, instrct, "io");
         end
         2'b10: begin //! li
-            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "li");
+            $display("PC[%02d] Ins:%08b %02x li r%1d %1d << %1d(%1d)"
+                , PC, instrct, instrct, rd, imm, s, imm << s);
         end
         2'b11: begin //! bner0
-            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "bner0");
+            $display("PC[%02d] Ins:%08b %02x bner0 r%1d %2d"
+                , PC, instrct, instrct, rs2, offset_s);
         end
     endcase
 end
