@@ -38,7 +38,8 @@ wire sys_rst;
 reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
-Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
+// Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
+assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
 
 //? PC
@@ -212,10 +213,12 @@ always@(posedge sys_clk) begin
             // $display("waddr = %1d din = %3d", waddr, din);
         end
         2'b11: begin //! bner0
-            $display("%02d: %08b  %02x  bner0 rs2 offset"
-                , PC, instrct, instrct);
-            $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
-                , "", "", rs2, offset_s, douta, doutb, next_PC);
+            if (PC < 16) begin
+                $display("%02d: %08b  %02x  bner0 rs2 offset"
+                    , PC, instrct, instrct);
+                $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
+                    , "", "", rs2, offset_s, douta, doutb, next_PC);
+            end
         end
     endcase
 end
