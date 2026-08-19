@@ -39,7 +39,7 @@ reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
 Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
-assign sys_rst = btn[2] | rst;
+assign sys_rst = ~btn[2] | rst;
 
 //? PC
 reg [7:0] rom_PC [255:0];
