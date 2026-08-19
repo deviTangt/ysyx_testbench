@@ -48,11 +48,13 @@ assign ps2_ready_get_n = 1'b0;
 
 
 reg [7:0] ps2_code_pre;
+reg [7:0] ps2_code_pre_p;
 reg [7:0] ps2_cpde_pre_valid;
-wire ps2_tick_off = (ps2_code_pre == 8'hf0);
+wire ps2_tick_off = (ps2_code_pre != 8'hf0) && (ps2_code_pre_p == 8'hf0);
 wire ps2_diff = (ps2_code != 8'hf0) && (ps2_code_pre != 8'hf0) && (ps2_code != ps2_code_pre);
 
 Reg #(8, 8'h00) r1 (clk, rst, ps2_code, ps2_code_pre, ps2_data_valid);
+Reg #(8, 8'h00) rp (clk, rst, ps2_code_pre, ps2_code_pre_p, 1'b1);
 Reg #(8, 8'h00) r2 (clk, rst, ps2_code_pre, ps2_cpde_pre_valid, ps2_diff);
 
 reg [7:0] cnt_tick;
