@@ -11,7 +11,7 @@ VERILATOR_CHECK = --lint-only
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
-TB = $(BUILD_DIR)/$(TOPNAME)
+TB = $(BUILD_DIR)/$(TOPNAME)_tb
 
 # create ./build if non exist
 $(shell mkdir -p $(BUILD_DIR))
