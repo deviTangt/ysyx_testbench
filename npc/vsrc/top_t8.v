@@ -55,11 +55,11 @@ Reg #(10, 10'd0) r1(clk, rst, vc_next, vc, 1'b1);
 
 assign VGA_HSYNC = (h_frontporch < hc);
 assign VGA_VSYNC = (v_frontporch < hc);
-assign VGA_BLANK_N = ~rst;
 
 wire px_valid = (h_active <= hc) && (hc < h_backporch);
 wire py_valid = (v_active <= vc) && (vc < v_backporch);
 wire pxy_valid = px_valid & py_valid;
+assign VGA_BLANK_N = pxy_valid;
 assign px = hc - h_active;
 assign py = vc - v_active;
 
