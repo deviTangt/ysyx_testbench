@@ -175,8 +175,10 @@ wire signed [3:0] offset_s = offset;
 always@(posedge sys_clk) begin
     case(instruct_type)
         2'b00: begin //! add
-            $display("%02d: %08b  %02x  add r%1d r%1d r%1d"
-                , PC, instrct, instrct, rd, rs1, rs2);
+            $display("%02d: %08b  %02x  add rd rs1 rs2"
+                , PC, instrct, instrct);
+            $display("%02s  %08s   |  add r%1d r%1d  r%1d (r%1d -> %d)"
+                , "", "", rd, rs1, rs2, rd, add_result);
         end
         2'b01: begin //! io
             $display("PC[%02d] Instruct:%08b Type:%s", PC, instrct, "io");
@@ -184,7 +186,7 @@ always@(posedge sys_clk) begin
         2'b10: begin //! li
             $display("%02d: %08b  %02x  li rd imm << s"
                 , PC, instrct, instrct);
-            $display("%02s  %08s  [   li r%1d %3d << %1d (r%1d -> %1d)"
+            $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %1d)"
                 , "", "", rd, imm, s, rd, imm << s);
         end
         2'b11: begin //! bner0
