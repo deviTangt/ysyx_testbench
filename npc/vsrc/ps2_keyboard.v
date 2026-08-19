@@ -41,11 +41,13 @@ module ps2_keyboard(clk,clrn,ps2_clk,ps2_data,data,
                     w_ptr <= w_ptr+3'b1;
                     ready <= 1'b1;
                     overflow <= overflow | (r_ptr == (w_ptr + 3'b1));
+                    $display("receive code %x\r\n", buffer[8:1]);
                 end
                 count <= 0;     // for next
               end else begin
                 buffer[count] <= ps2_data;  // store ps2_data
                 count <= count + 3'b1;
+                $display("receive bit %d\r\n", ps2_data);
               end
             end
         end
