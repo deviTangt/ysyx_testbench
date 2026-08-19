@@ -172,7 +172,20 @@ bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
 bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
 always@(posedge sys_clk) begin
-    $display("PC[%d] Instruct:%08b Type:%d", PC, instrct, instruct_type);
+    case(instruct_type)
+        2'b00: begin //! add
+            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "add");
+        end
+        2'b01: begin //! io
+            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "io");
+        end
+        2'b10: begin //! li
+            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "li");
+        end
+        2'b11: begin //! bner0
+            $display("PC[%d] Instruct:%08b Type:%s", PC, instrct, "bner0");
+        end
+    endcase
 end
 
 endmodule
