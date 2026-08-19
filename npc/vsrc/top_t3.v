@@ -101,8 +101,8 @@ bcd7seg ins_seg7(.b(num1_w1), .h(seg7));
 bcd7seg ins_seg6(.b(num1_w0), .h(seg6));
 bcd7seg ins_seg5(.b(num2_w1), .h(seg5));
 bcd7seg ins_seg4(.b(num2_w0), .h(seg4));
-bcd7seg ins_seg3(.b({3'd0, f_zero}), .h(seg3));
-bcd7seg ins_seg2(.b({2'd0, f_of, f_carry}), .h(seg2));
+bcd7seg ins_seg3(.b({2'd0, f_zero, f_of}), .h(seg3));
+bcd7seg ins_seg2(.b({3'd0, f_carry}), .h(seg2));
 bcd7seg ins_seg1(.b(res_w1), .h(seg1));
 bcd7seg ins_seg0(.b(res_w0), .h(seg0));
 
