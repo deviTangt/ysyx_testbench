@@ -23,7 +23,7 @@ static void reset(int n) {
   top->rst = 0;
 }
 
-#define WAVE_TRACE 1
+#define WAVE_TRACE 0
 
 int main(int argc, char** argv) {
   VerilatedContext* contextp = new VerilatedContext;
