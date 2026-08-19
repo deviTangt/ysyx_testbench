@@ -11,6 +11,7 @@ VERILATOR_CHECK = --lint-only
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
+TB = $(BUILD_DIR)/$(TOPNAME)
 
 default: $(BIN)
 
@@ -26,13 +27,14 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
+TSRCS = $(shell find $(abspath ./test_bench) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
 # rules for NVBoard
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 # rules for verilator
 INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+CXXFLAGS = $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
@@ -43,10 +45,16 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
 		--trace-fst
 
+$(TB): $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CFLAGS) \
+		--top-module $(TOPNAME) $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE) \
+		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TB)) \
+		--trace-fst
 
-all:
-	@echo "Write this Makefile by your self."
-	default
+all: default
+	@echo "Write this Makefile by your self. Default"
 
 # 仿真
 sim: $(BIN)
@@ -65,6 +73,10 @@ check: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 run: $(BIN)
 	@$^
 
+tb: $(TB)
+	@echo "Work on Testbench"
+	@$^
+
 # 清理目标
 clean: 
 	rm -rf $(BUILD_DIR)
@@ -73,5 +85,6 @@ clean:
 gtk:
 	gtkwave wave.fst
 
+
 include ../Makefile
-.PHONY: default all clean run
+.PHONY: default all clean run sim gtk check

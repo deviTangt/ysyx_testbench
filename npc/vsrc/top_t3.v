@@ -43,7 +43,7 @@ reg  [2:0] op;
 wire [2:0] op_n;
 assign op_n = btn_pos[4] ? (op + 3'b1) : btn_pos[0] ? (op - 3'b1) : (op); 
 Reg #(3, 0) r_m (clk, rst, op_n, op, btn_pos[0] | btn_pos[2] | btn_pos[4]);
-assign ledr[7:0] = (1 << op);
+assign ledr[15:12] = (1 << op);
 
 
 wire f_zero;
@@ -52,6 +52,11 @@ wire f_carry;
 reg  [3:0] result;
 
 assign f_zero = ~(| result);
+
+assign ledr[6] = f_zero;
+assign ledr[5] = f_of;
+assign ledr[4] = f_carry;
+assign ledr[3:0] = result;
 
 //? 0 / 1
 wire [3:0] res_op_add_sub;

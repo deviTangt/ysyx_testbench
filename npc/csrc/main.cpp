@@ -23,6 +23,8 @@ static void reset(int n) {
   top->rst = 0;
 }
 
+#define WAVE_TRACE 1
+
 int main(int argc, char** argv) {
   VerilatedContext* contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
@@ -36,25 +38,32 @@ int main(int argc, char** argv) {
   reset(10);
   
   // 开启波形记录
-  Verilated::traceEverOn(true);
-  
-  VerilatedFstC* tfp = new VerilatedFstC;
-  top->trace(tfp, 99);       // 99 表示记录 99 层层次
-  tfp->open("wave.fst");     // 输出 FST 文件
+  #if WAVE_TRACE
+    Verilated::traceEverOn(true);
+    
+    VerilatedFstC* tfp = new VerilatedFstC;
+    top->trace(tfp, 99);       // 99 表示记录 99 层层次
+    tfp->open("wave.fst");     // 输出 FST 文件
+  #endif
   
   int cnt_loop = 0;
   while (1) {
     nvboard_update();
     single_cycle();
 
-    tfp->dump(contextp->time()); // 把当前时刻写入波形
-    contextp->timeInc(1);        // 仿真时间前进 1
+    #if WAVE_TRACE
+      tfp->dump(contextp->time()); // 把当前时刻写入波形
+      contextp->timeInc(1);        // 仿真时间前进 1
+    #endif
     
     cnt_loop ++;
   }
 
-  tfp->close();
-  delete tfp;
+  #if WAVE_TRACE
+    tfp->close();
+    delete tfp;
+  #endif
+
   delete top;
   delete contextp;
   return 0;
