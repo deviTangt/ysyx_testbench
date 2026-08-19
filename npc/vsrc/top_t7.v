@@ -36,15 +36,17 @@ reg  [4:0] btn_p;
 Reg #(5, 0) r_b (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
 
-reg [7:0] lfsr;
-wire [7:0] lfsr_n; 
-assign lfsr_n[6:0] = lfsr[7:1];
-assign lfsr_n[7] = lfsr[4] ^ lfsr[3] ^ lfsr[2] ^ lfsr[0];
-Reg #(8, 8'h01) r0 (clk, btn_pos[4] | rst, lfsr_n, lfsr, btn_pos[0]);
+reg [7:0] ps2_code;
+wire [7:0] ps2_data_out;
+wire ps2_data_valid;
+wire ps2_ready_get_n;
+wire ps2_of;
+ps2_keyboard ps2(clk, rst | btn_pos[4] | ps2_of, ps2_clk, ps2_data, ps2_data_out,
+                    ps2_data_valid, ps2_ready_get_n, ps2_of);
+Reg #(8, 8'h00) r0 (clk, rst, ps2_data_out, ps2_code, ps2_data_valid);
+assign ps2_ready_get_n = 1'b0;
 
-reg [7:0] led_buf;
-Reg #(8, 8'd1) r1 (clk, rst, led_buf + 8'd1, led_buf, btn_pos[0]);
-assign ledr[7:0] = led_buf; 
+
 
 //output debuginfo to bcd
 // bcd7seg_AF ins_seg7(.b(4'd14), .h(seg7));
@@ -59,7 +61,7 @@ assign seg5 = 8'hff;
 assign seg4 = 8'hff;
 assign seg3 = 8'hff;
 assign seg2 = 8'hff;
-bcd7seg_AF ins_seg1(.b(lfsr[7:4]), .h(seg1));
-bcd7seg_AF ins_seg0(.b(lfsr[3:0]), .h(seg0));
+bcd7seg_AF ins_seg1(.b(ps2_code[7:4]), .h(seg1));
+bcd7seg_AF ins_seg0(.b(ps2_code[3:0]), .h(seg0));
 
 endmodule
