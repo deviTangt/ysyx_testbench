@@ -41,7 +41,7 @@ wire [4:0] btn_pos = ~btn_p & btn;
 
 reg  [2:0] op;
 wire [2:0] op_n;
-assign op_n = btn_pos[0] ? (op + 3'b1) : btn_pos[4] ? (op - 3'b1) : (op); 
+assign op_n = btn_pos[4] ? (op + 3'b1) : btn_pos[0] ? (op - 3'b1) : (op); 
 Reg #(3, 0) r_m (clk, rst, op_n, op, btn_pos[0] | btn_pos[2] | btn_pos[4]);
 assign ledr[7:0] = (1 << op);
 
