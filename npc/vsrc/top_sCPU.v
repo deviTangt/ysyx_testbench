@@ -188,14 +188,17 @@ always@(posedge sys_clk) begin
         2'b01: begin //! io
             if (io_out) begin
                 $display("%02d: %08b  %02x  io out rd -> dev[idx]"
-                , PC, instrct, instrct);
+                    , PC, instrct, instrct);
                 $display("%02s  %08s   |  io out r%1d -> dev[%03b] (dev[%03b] = %3d)"
-                , "", "", rd, idx, idx, doutb);
+                    , "", "", rd, idx, idx, doutb);
+
+                $display("raddrb = %1d doutb = %3d"
+                    , raddrb, doutb);
             end else begin
                 $display("%02d: %08b  %02x  io in  dev[idx] -> rd"
-                , PC, instrct, instrct);
+                    , PC, instrct, instrct);
                 $display("%02s  %08s   |  io in  dev[%03b] -> r%1d (rd = %3d)"
-                , "", "", idx, rd, din);
+                    , "", "", idx, rd, din);
             end
         end
         2'b10: begin //! li
