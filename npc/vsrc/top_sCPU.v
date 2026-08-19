@@ -192,8 +192,7 @@ always@(posedge sys_clk) begin
                 $display("%02s  %08s   |  io out r%1d -> dev[%03b] (dev[%03b] = %3d)"
                     , "", "", rd, idx, idx, doutb);
 
-                $display("raddrb = %1d doutb = %3d"
-                    , raddrb, doutb);
+                $display("raddrb = %1d doutb = %3d", raddrb, doutb);
             end else begin
                 $display("%02d: %08b  %02x  io in  dev[idx] -> rd"
                     , PC, instrct, instrct);
@@ -206,6 +205,8 @@ always@(posedge sys_clk) begin
                 , PC, instrct, instrct);
             $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %3d)"
                 , "", "", rd, imm, s, rd, imm << s);
+
+            $display("waddr = %1d din = %3d", waddr, din);
         end
         2'b11: begin //! bner0
             $display("%02d: %08b  %02x  bner0 rs2 offset"
