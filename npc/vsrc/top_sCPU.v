@@ -177,21 +177,33 @@ always@(posedge sys_clk) begin
         2'b00: begin //! add
             $display("%02d: %08b  %02x  add rd rs1 rs2"
                 , PC, instrct, instrct);
-            $display("%02s  %08s   |  add r%1d r%1d  r%1d (r%1d -> %d)"
+            $display("%02s  %08s   |  add r%1d r%1d  r%1d (r%1d -> %3d)"
                 , "", "", rd, rs1, rs2, rd, add_result);
         end
         2'b01: begin //! io
-            $display("PC[%02d] Instruct:%08b Type:%s", PC, instrct, "io");
+            if (io_out) begin
+                $display("%02d: %08b  %02x  io out rd -> dev[idx]"
+                , PC, instrct, instrct);
+                $display("%02s  %08s   |  io out r%1d -> dev[%03b] (dev[%03b] = %3d)"
+                , "", "", rd, idx, idx, doutb);
+            end else begin
+                $display("%02d: %08b  %02x  io in  dev[idx] -> rd"
+                , PC, instrct, instrct);
+                $display("%02s  %08s   |  io in  dev[%03b] -> r%1d (rd = %3d)"
+                , "", "", idx, rd, din);
+            end
         end
         2'b10: begin //! li
             $display("%02d: %08b  %02x  li rd imm << s"
                 , PC, instrct, instrct);
-            $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %1d)"
+            $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %3d)"
                 , "", "", rd, imm, s, rd, imm << s);
         end
         2'b11: begin //! bner0
-            $display("%02d: %08b  %02x  bner0 r%1d %2d"
-                , PC, instrct, instrct, rs2, offset_s);
+            $display("%02d: %08b  %02x  bner0 rs2 offset"
+                , PC, instrct, instrct);
+            $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
+                , "", "", rs2, offset_s, douta, doutb, next_PC);
         end
     endcase
 end
