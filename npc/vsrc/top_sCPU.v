@@ -35,6 +35,9 @@ module top(
 ////----------- Parameters ------------////
 //? PC
 reg [7:0] rom_PC [255:0];
+initial begin
+    $readmemh("resource/rom_PC.hex", rom_PC);
+end
 reg [7:0] PC;
 wire [7:0] next_PC;
 
