@@ -53,12 +53,12 @@ assign ledr[7:0] = led_buf;
 // bcd7seg_AF ins_seg4(.b(4'd14), .h(seg4));
 // bcd7seg_AF ins_seg3(.b(4'd14), .h(seg3));
 // bcd7seg_AF ins_seg2(.b(4'd14), .h(seg2));
-assign seg7 = 8'h00;
-assign seg6 = 8'h00;
-assign seg5 = 8'h00;
-assign seg4 = 8'h00;
-assign seg3 = 8'h00;
-assign seg2 = 8'h00;
+assign seg7 = 8'hff;
+assign seg6 = 8'hff;
+assign seg5 = 8'hff;
+assign seg4 = 8'hff;
+assign seg3 = 8'hff;
+assign seg2 = 8'hff;
 bcd7seg_AF ins_seg1(.b(lfsr[7:4]), .h(seg1));
 bcd7seg_AF ins_seg0(.b(lfsr[3:0]), .h(seg0));
 
