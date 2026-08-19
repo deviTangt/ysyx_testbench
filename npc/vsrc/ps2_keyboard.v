@@ -47,7 +47,7 @@ module ps2_keyboard(clk,clrn,ps2_clk,ps2_data,data,
               end else begin
                 buffer[count] <= ps2_data;  // store ps2_data
                 count <= count + 3'b1;
-                $display("receive bit %d\r\n", ps2_data);
+                // $display("receive bit %d\r\n", ps2_data);
               end
             end
         end
