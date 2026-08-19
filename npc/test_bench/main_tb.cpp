@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
     rd_res = (top->btn & 0xf);
 
     //? check
+    #define ERR_MAX_TRACE 20
     if (err_cnt < 20){
       if (rd_f_zero != f_zero){
         printf("Zero Error at %d + %d, output %d, exactual %d\r\n", num1, num2, f_zero, rd_f_zero);
@@ -95,6 +96,7 @@ int main(int argc, char** argv) {
     }
 
 
+    if (err_cnt < ERR_MAX_TRACE)
     if (num2 == 8){
       if (num1 == 8){
         num1 = -7;
