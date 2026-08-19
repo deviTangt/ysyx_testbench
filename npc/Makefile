@@ -88,4 +88,4 @@ gtk:
 
 
 include ../Makefile
-.PHONY: default all clean run sim gtk check
+.PHONY: default all clean run 
