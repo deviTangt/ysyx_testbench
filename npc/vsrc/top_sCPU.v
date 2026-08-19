@@ -140,12 +140,6 @@ assign ledr[7:0] = io_led_r;
 
 Reg #(8, 8'd0) R_seg(clk, rst, doutb, io_seg_r, out_seg);
 // output debuginfo to bcd
-bcd7seg_AF ins_seg7(.b(4'd0), .h(seg7), .en(1'b0));
-bcd7seg_AF ins_seg6(.b(4'd0), .h(seg6), .en(1'b0));
-bcd7seg_AF ins_seg5(.b(4'd0), .h(seg5), .en(1'd0));
-bcd7seg_AF ins_seg4(.b(4'd0), .h(seg4), .en(1'd0));
-bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
-bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
 bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
 
@@ -160,5 +154,14 @@ assign off_ext = {{4{offset[3]}}, offset};
 
 
 assign ledr[15:8] = PC;
+
+wire [7:0] PC_w1 = PC / 10 % 10;
+wire [7:0] PC_w0 = PC % 10;
+bcd7seg_AF ins_seg7(.b(PC_w1[3:0]), .h(seg7), .en(1'b1));
+bcd7seg_AF ins_seg6(.b(PC_w0[3:0]), .h(seg6), .en(1'b1));
+bcd7seg_AF ins_seg5(.b(instrct[7:4]), .h(seg5), .en(1'd1));
+bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd1));
+bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
+bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
 endmodule
