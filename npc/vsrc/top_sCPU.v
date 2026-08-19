@@ -38,8 +38,8 @@ wire sys_rst;
 reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
-Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
-// assign sys_clk = clk;
+// Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
+assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
 
 //? PC
@@ -158,8 +158,8 @@ Reg #(8, 8'd0) R_seg(sys_clk, sys_rst, doutb, io_seg_r, out_seg);
 bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
 bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
 
-assign sw_in = {4'd0, sw[7:4]};
-assign btn_in = {4'd0, sw[3:0]};
+assign sw_in = {4'd0, sw[3:0]};
+assign btn_in = {4'd0, btn[3:0]};
 
 //? li
 assign imm_8b = ({6'd0, imm} << s);
