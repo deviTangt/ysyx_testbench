@@ -79,7 +79,13 @@ wire [3:0] res_op_xor;
 assign res_op_xor = num1 ^ num2;
 //? 6
 wire [3:0] res_op_cmp;
-assign res_op_cmp = {3'd0, (num1 < num2)};
+assign res_op_cmp[3:1] = 3'd0;
+MuxKeyWithDefault #(4, 2, 1) icmp (res_op_cmp[0], {num1[3], num2[3]}, 1'b0, {
+    2'b00, num1 < num2,
+    2'b01, 1'b0,
+    2'b10, 1'b1,
+    2'b11, num1 < num2
+  });
 //? 7
 wire [3:0] res_op_equ;
 assign res_op_equ = {3'd0, (num1 == num2)};
