@@ -38,6 +38,7 @@ reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
 Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
+wire sys_rst = btn_pos[2] | rst;
 
 //? PC
 reg [7:0] rom_PC [255:0];
@@ -92,7 +93,7 @@ wire bne0;
 ////----------- Logic ------------////
 //? PC
 assign next_PC = (type_bner0 & bne0) ? PC + off_ext : PC + 8'd1;
-Reg #(8, 8'd0) R_PC(sys_clk, rst, next_PC, PC, 1'b1);
+Reg #(8, 8'd0) R_PC(sys_clk, sys_rst, next_PC, PC, 1'b1);
 
 //? RAM GPR
 ram_GPR i_GPR(
@@ -102,7 +103,7 @@ ram_GPR i_GPR(
   .waddr(waddr),
   .wen(wen),
   .clk(sys_clk),
-  .rst(rst),
+  .rst(sys_rst),
 
   .douta(douta),
   .doutb(doutb)
@@ -141,10 +142,10 @@ assign in_btn  = idx == 3'b001 && io_in;
 assign add_result = douta + doutb;
 
 //? io
-Reg #(8, 8'd0) R_led(sys_clk, rst, doutb, io_led_r, out_led);
+Reg #(8, 8'd0) R_led(sys_clk, sys_rst, doutb, io_led_r, out_led);
 assign ledr[7:0] = io_led_r;
 
-Reg #(8, 8'd0) R_seg(sys_clk, rst, doutb, io_seg_r, out_seg);
+Reg #(8, 8'd0) R_seg(sys_clk, sys_rst, doutb, io_seg_r, out_seg);
 // output debuginfo to bcd
 bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
 bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
