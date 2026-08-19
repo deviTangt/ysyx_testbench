@@ -41,7 +41,7 @@ wire [7:0] ps2_data_out;
 wire ps2_data_valid;
 wire ps2_ready_get_n;
 wire ps2_of;
-ps2_keyboard ps2(clk, rst | btn_pos[4] | ps2_of, ps2_clk, ps2_data, ps2_data_out,
+ps2_keyboard ps2(clk, ~(rst | btn_pos[4] | ps2_of), ps2_clk, ps2_data, ps2_data_out,
                     ps2_data_valid, ps2_ready_get_n, ps2_of);
 Reg #(8, 8'h00) r0 (clk, rst, ps2_data_out, ps2_code, ps2_data_valid);
 assign ps2_ready_get_n = 1'b0;
