@@ -47,9 +47,9 @@ assign VGA_CLK = clk;
 reg [9:0] hc, vc;
 wire [9:0] px, py;
 
-wire [9:0] hc_next = (hc == h_total) ? 0 : (hc + 'd1);
-wire [9:0] vc_next = (hc == h_total && vc == v_total) ? 0 : 
-                         (hc == h_total) ? vc + 'd1 : vc;
+wire [9:0] hc_next = (hc == h_total - 1) ? 0 : (hc + 'd1);
+wire [9:0] vc_next = (hc == h_total - 1 && vc == v_total - 1) ? 0 : 
+                         (hc == h_total - 1) ? vc + 'd1 : vc;
 Reg #(10, 10'd0) r0(clk, rst, hc_next, hc, 1'b1);
 Reg #(10, 10'd0) r1(clk, rst, vc_next, vc, 1'b1);
 
