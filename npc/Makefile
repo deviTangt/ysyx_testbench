@@ -11,6 +11,7 @@ VERILATOR_CHECK = --lint-only
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
+OBJ_DIR_TB = $(BUILD_DIR)/obj_dir_tb
 TB = $(BUILD_DIR)/$(TOPNAME)_tb
 
 # create ./build if non exist
@@ -44,11 +45,11 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 		--trace-fst
 
 $(TB): $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE)
-	@rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR_TB)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE) \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TB)) \
+		--Mdir $(OBJ_DIR_TB) --exe -o $(abspath $(TB)) \
 		--trace-fst
 
 default: $(BIN)
@@ -60,11 +61,7 @@ all: default
 sim: $(BIN)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	@rm -rf $(OBJ_DIR)
 	@$^
-
-# 	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
-# 	obj_dir/Vtop
 
 # validate check
 check: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
