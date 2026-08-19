@@ -35,9 +35,13 @@ module top(
 ////----------- Parameters ------------////
 reg sys_clk;
 wire sys_rst;
-reg  [4:0] btn_p;
-Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
-wire [4:0] btn_neg = btn_p & ~btn;
+reg  [4:0] btn_p [4:0];
+Reg #(5, 5'd0) r_btn0 (clk, rst, btn, btn_p[0], 1'b1);
+Reg #(5, 5'd0) r_btn1 (clk, rst, btn_p[0], btn_p[1], 1'b1);
+Reg #(5, 5'd0) r_btn2 (clk, rst, btn_p[1], btn_p[2], 1'b1);
+Reg #(5, 5'd0) r_btn3 (clk, rst, btn_p[2], btn_p[3], 1'b1);
+Reg #(5, 5'd0) r_btn4 (clk, rst, btn_p[3], btn_p[4], 1'b1);
+wire [4:0] btn_neg = btn_p[4] & ~btn;
 // Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_neg[4]);
 assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
@@ -155,8 +159,11 @@ assign ledr[7:0] = io_led_r;
 
 Reg #(8, 8'd0) R_seg(sys_clk, sys_rst, doutb, io_seg_r, out_seg);
 // output debuginfo to bcd
-bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
-bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
+
+wire [7:0] io_seg_r_w1 = io_seg_r / 10 % 10;
+wire [7:0] io_seg_r_w0 = io_seg_r % 10;
+bcd7seg_AF ins_seg1(.b(io_seg_r_w1[3:0]), .h(seg1), .en(1'b1));
+bcd7seg_AF ins_seg0(.b(io_seg_r_w0[3:0]), .h(seg0), .en(1'b1));
 
 assign sw_in = {4'd0, sw[3:0]};
 assign btn_in = {4'd0, btn_neg[3:0]};
@@ -175,10 +182,10 @@ assign ledr[14] = sys_rst;
 
 wire [7:0] PC_w1 = PC / 10 % 10;
 wire [7:0] PC_w0 = PC % 10;
-bcd7seg_AF ins_seg7(.b(PC_w1[3:0]), .h(seg7), .en(1'b1));
-bcd7seg_AF ins_seg6(.b(PC_w0[3:0]), .h(seg6), .en(1'b1));
-bcd7seg_AF ins_seg5(.b(instrct[7:4]), .h(seg5), .en(1'd1));
-bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd1));
+bcd7seg_AF ins_seg7(.b(PC_w1[3:0]), .h(seg7), .en(1'b0));
+bcd7seg_AF ins_seg6(.b(PC_w0[3:0]), .h(seg6), .en(1'b0));
+bcd7seg_AF ins_seg5(.b(instrct[7:4]), .h(seg5), .en(1'd0));
+bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd0));
 bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
 bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
