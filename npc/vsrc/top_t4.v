@@ -47,13 +47,13 @@ Reg #(8, 8'd1) r1 (clk, rst, led_buf + 8'd1, led_buf, btn_pos[0]);
 assign ledr[7:0] = led_buf; 
 
 //output debuginfo to bcd
-bcd7seg ins_seg7(.b(4'd14), .h(seg7));
-bcd7seg ins_seg6(.b(4'd14), .h(seg6));
-bcd7seg ins_seg5(.b(4'd14), .h(seg5));
-bcd7seg ins_seg4(.b(4'd14), .h(seg4));
-bcd7seg ins_seg3(.b(4'd14), .h(seg3));
-bcd7seg ins_seg2(.b(4'd14), .h(seg2));
-bcd7seg ins_seg1(.b(lfsr[7:4]), .h(seg1));
-bcd7seg ins_seg0(.b(lfsr[3:0]), .h(seg0));
+bcd7seg_AF ins_seg7(.b(4'd14), .h(seg7));
+bcd7seg_AF ins_seg6(.b(4'd14), .h(seg6));
+bcd7seg_AF ins_seg5(.b(4'd14), .h(seg5));
+bcd7seg_AF ins_seg4(.b(4'd14), .h(seg4));
+bcd7seg_AF ins_seg3(.b(4'd14), .h(seg3));
+bcd7seg_AF ins_seg2(.b(4'd14), .h(seg2));
+bcd7seg_AF ins_seg1(.b(lfsr[7:4]), .h(seg1));
+bcd7seg_AF ins_seg0(.b(lfsr[3:0]), .h(seg0));
 
 endmodule
