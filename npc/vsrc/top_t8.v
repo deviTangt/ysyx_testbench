@@ -63,7 +63,7 @@ wire pxy_valid = px_valid & py_valid;
 assign px = hc - h_active;
 assign py = vc - v_active;
 
-wire [18:0] rgb_addr = py * 640 + {9'd0, px};
+wire [18:0] rgb_addr = {px, py[8:0]};
 reg [23:0] vga_mem [524287:0];
 assign {VGA_R, VGA_G, VGA_B} = pxy_valid ? vga_mem[rgb_addr] : 24'd0;
 
