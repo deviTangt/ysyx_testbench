@@ -13,8 +13,6 @@ OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
 TB = $(BUILD_DIR)/$(TOPNAME)
 
-default: $(BIN)
-
 # create ./build if non exist
 $(shell mkdir -p $(BUILD_DIR))
 
@@ -53,6 +51,8 @@ $(TB): $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE)
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TB)) \
 		--trace-fst
 
+default: $(BIN)
+
 all: default
 	@echo "Write this Makefile by your self. Default"
 
@@ -88,4 +88,4 @@ gtk:
 
 
 include ../Makefile
-.PHONY: default all clean run 
+.PHONY: default all sim check run tb clean gtk
