@@ -171,4 +171,8 @@ bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd1));
 bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
 bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
+always@(posedge sys_clk) begin
+    $display("PC[%d] Instruct:%08b Type:%d", PC, instrct, instruct_type);
+end
+
 endmodule
