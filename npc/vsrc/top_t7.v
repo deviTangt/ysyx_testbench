@@ -60,13 +60,16 @@ Reg #(8, 8'h00) r2 (clk, rst, ps2_code_pre, ps2_cpde_pre_valid, ps2_diff);
 reg [7:0] cnt_tick;
 Reg #(8, 8'h00) r3 (clk, rst, cnt_tick + 8'd1, cnt_tick, ps2_tick_off);
 
+wire [7:0] tx_ascii;
+PS2_to_ASCII pta(ps2_code, tx_ascii);
+
 //output debuginfo to bcd
 bcd7seg_AF ins_seg7(.b(cnt_tick[7:4]), .h(seg7), .en(1'b1));
 bcd7seg_AF ins_seg6(.b(cnt_tick[3:0]), .h(seg6), .en(1'b1));
-bcd7seg_AF ins_seg5(.b(ps2_cpde_pre_valid[7:4]), .h(seg5), .en(1'b1));
-bcd7seg_AF ins_seg4(.b(ps2_cpde_pre_valid[3:0]), .h(seg4), .en(1'b1));
-bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'b0));
-bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'b0));
+bcd7seg_AF ins_seg5(.b(ps2_cpde_pre_valid[7:4]), .h(seg5), .en(1'b0));
+bcd7seg_AF ins_seg4(.b(ps2_cpde_pre_valid[3:0]), .h(seg4), .en(1'b0));
+bcd7seg_AF ins_seg3(.b(tx_ascii[7:4]), .h(seg3), .en(ps2_code_pre != 8'hf0));
+bcd7seg_AF ins_seg2(.b(tx_ascii[3:0]), .h(seg2), .en(ps2_code_pre != 8'hf0));
 bcd7seg_AF ins_seg1(.b(ps2_code[7:4]), .h(seg1), .en(ps2_code_pre != 8'hf0));
 bcd7seg_AF ins_seg0(.b(ps2_code[3:0]), .h(seg0), .en(ps2_code_pre != 8'hf0));
 
