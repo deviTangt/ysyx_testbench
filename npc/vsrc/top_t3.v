@@ -91,11 +91,11 @@ MuxKeyWithDefault #(8, 3, 4) i0 (result, op, 4'd0, {
   });
 
 wire [3:0] num1_w1 = (op > 3'd2) ? {3'd0, num1 > 4'd9} : (num1[3] ? 4'd15 : 4'd14);
-wire [3:0] num1_w0 = (op > 3'd2) ? (num1 > 4'd9 ? num1 - 4'd10 : num1) : (~num1 + 4'd1);
+wire [3:0] num1_w0 = (op > 3'd2) ? (num1 > 4'd9 ? num1 - 4'd10 : num1) : (num1[3] ? ~num1 + 4'd1 : num1);
 wire [3:0] num2_w1 = (op > 3'd2) ? {3'd0, num2 > 4'd9} : (num2[3] ? 4'd15 : 4'd14);
-wire [3:0] num2_w0 = (op > 3'd2) ? (num2 > 4'd9 ? num2 - 4'd10 : num2) :  (~num2 + 4'd1);
+wire [3:0] num2_w0 = (op > 3'd2) ? (num2 > 4'd9 ? num2 - 4'd10 : num2) :  (num2[3] ? ~num2 + 4'd1 : num2);
 wire [3:0] res_w1 = (op > 3'd2) ? {3'd0, result > 4'd9} : (result[3] ? 4'd15 : 4'd14);
-wire [3:0] res_w0 = (op > 3'd2) ? (result > 4'd9 ? result - 4'd10 : result) :  (~result + 4'd1);
+wire [3:0] res_w0 = (op > 3'd2) ? (result > 4'd9 ? result - 4'd10 : result) :  (result[3] ? ~result + 4'd1 : result);
 //output debuginfo to bcd
 bcd7seg ins_seg7(.b(num1_w1), .h(seg7));
 bcd7seg ins_seg6(.b(num1_w0), .h(seg6));
