@@ -92,7 +92,9 @@ MuxKeyWithDefault #(8, 3, 4) i0 (result, op, 4'd0, {
 
 //output debuginfo to bcd
 bcd7seg ins_seg7(.b(num1), .h(seg7));
+bcd7seg ins_seg6(.b(4'd0), .h(seg6));
 bcd7seg ins_seg5(.b(num2), .h(seg5));
+bcd7seg ins_seg4(.b(4'd0), .h(seg4));
 bcd7seg ins_seg3(.b({3'd0, f_zero}), .h(seg3));
 bcd7seg ins_seg2(.b({3'd0, f_of}), .h(seg2));
 bcd7seg ins_seg1(.b({3'd0, f_carry}), .h(seg1));
