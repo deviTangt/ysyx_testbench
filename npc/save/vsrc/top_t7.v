@@ -58,6 +58,7 @@ Reg #(8, 8'h00) rp (clk, rst, ps2_code_pre, ps2_code_pre_p, 1'b1);
 Reg #(8, 8'h00) r2 (clk, rst, ps2_code_pre, ps2_cpde_pre_valid, ps2_diff);
 
 reg [7:0] cnt_tick;
+reg [7:0] cnt_tick;
 Reg #(8, 8'h00) r3 (clk, rst, cnt_tick + 8'd1, cnt_tick, ps2_tick_off);
 
 wire [7:0] tx_ascii;
