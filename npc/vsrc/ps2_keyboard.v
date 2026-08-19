@@ -41,7 +41,7 @@ module ps2_keyboard(clk,clrn,ps2_clk,ps2_data,data,
                     w_ptr <= w_ptr+3'b1;
                     ready <= 1'b1;
                     overflow <= overflow | (r_ptr == (w_ptr + 3'b1));
-                    $display("receive code %x\r\n", buffer[8:1]);
+                    $display("receive code %02x [%d / %d]\r\n", buffer[8:1], (w_ptr + 8 - r_ptr) % 8, 8);
                     if (overflow | (r_ptr == (w_ptr + 3'b1)))
                       $display("PS2 Data OverFlow!!!\r\n");  
                 end
