@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
   top = new Vtop{contextp};
 
-  printf("Hello, ysyx!\n");
+  printf("\r\nHello, ysyx!\r\n");
   nvboard_bind_all_pins(top);
   nvboard_init(0);
 

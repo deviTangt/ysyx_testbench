@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
   top = new Vtop{contextp};
 
-  printf("Hello, ysyx! TB\n");
+  printf("\r\nHello, ysyx! TB\r\n");
 
   reset(10);
   
