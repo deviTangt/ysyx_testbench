@@ -74,11 +74,11 @@ end
 
 //output debuginfo to bcd
 bcd7seg_AF ins_seg7(.b(4'd0), .h(seg7), .en(1'b1));
-bcd7seg_AF ins_seg6(.b(4'd0), .h(seg6), .en(1'b1));
-bcd7seg_AF ins_seg5(.b({2'd0, vc[9:8]}), .h(seg5), .en(hc[9:8] != 0));
-bcd7seg_AF ins_seg4(.b(vc[7:4]), .h(seg4), .en(vc[7:4] != 0));
-bcd7seg_AF ins_seg3(.b(vc[3:0]), .h(seg3), .en(1'b1));
-bcd7seg_AF ins_seg2(.b({2'd0, hc[9:8]}), .h(seg2), .en(hc[9:8] != 0));
+bcd7seg_AF ins_seg6(.b({4{pxy_valid}}), .h(seg6), .en(1'b1));
+bcd7seg_AF ins_seg5(.b({2'd0, vc[9:8]}), .h(seg5), .en(| hc[9:8]));
+bcd7seg_AF ins_seg4(.b(vc[7:4]), .h(seg4), .en(| vc[7:4]));
+bcd7seg_AF ins_seg3(.b(vc[3:0]), .h(seg3), .en(| vc[3:0]));
+bcd7seg_AF ins_seg2(.b({2'd0, hc[9:8]}), .h(seg2), .en(| hc[9:8]));
 bcd7seg_AF ins_seg1(.b(hc[7:4]), .h(seg1), .en(| hc[7:4]));
 bcd7seg_AF ins_seg0(.b(hc[3:0]), .h(seg0), .en(| hc[3:0]));
 
