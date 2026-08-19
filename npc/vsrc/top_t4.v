@@ -40,7 +40,7 @@ reg [7:0] lfsr;
 wire [7:0] lfsr_n; 
 assign lfsr_n[6:0] = lfsr[7:1];
 assign lfsr_n[7] = lfsr[4] ^ lfsr[3] ^ lfsr[2] ^ lfsr[0];
-Reg #(8, 8'h01) r0 (clk, btn_pos[4], lfsr_n, lfsr, btn_pos[0]);
+Reg #(8, 8'h01) r0 (clk, btn_pos[4] | rst, lfsr_n, lfsr, btn_pos[0]);
 
 reg [7:0] led_buf;
 Reg #(8, 8'd1) r1 (clk, rst, led_buf + 8'd1, led_buf, btn_pos[0]);
