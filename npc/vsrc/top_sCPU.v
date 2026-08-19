@@ -36,7 +36,9 @@ module top(
 //? PC
 reg [7:0] rom_PC [255:0];
 initial begin
+    $display("INFO: Trying load rom_PC.hex");
     $readmemh("resource/rom_PC.hex", rom_PC);
+    $display("rom[0]=%h rom[1]=%h", rom_PC[0], rom_PC[1]);
 end
 reg [7:0] PC;
 wire [7:0] next_PC;
