@@ -180,47 +180,48 @@ bcd7seg_AF ins_seg4(.b(instrct[3:0]), .h(seg4), .en(1'd1));
 bcd7seg_AF ins_seg3(.b(4'd0), .h(seg3), .en(1'd0));
 bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
+localparam PC_TRACE_MAX = 16;
 wire signed [3:0] offset_s = offset;
 always@(posedge sys_clk) begin
-    case(instruct_type)
-        2'b00: begin //! add
-            $display("%02d: %08b  %02x  add rd rs1 rs2"
-                , PC, instrct, instrct);
-            $display("%02s  %08s   |  add r%1d r%1d  r%1d (r%1d -> %3d)"
-                , "", "", rd, rs1, rs2, rd, add_result);
-        end
-        2'b01: begin //! io
-            if (io_out) begin
-                $display("%02d: %08b  %02x  io out rd -> dev[idx]"
+    if (PC < PC_TRACE_MAX) begin
+        case(instruct_type)
+            2'b00: begin //! add
+                $display("%02d: %08b  %02x  add rd rs1 rs2"
                     , PC, instrct, instrct);
-                $display("%02s  %08s   |  io out r%1d -> dev[%03b] (dev[%03b] = %3d)"
-                    , "", "", rd, idx, idx, doutb);
-
-                // $display("raddrb = %1d doutb = %3d", raddrb, doutb);
-            end else begin
-                $display("%02d: %08b  %02x  io in  dev[idx] -> rd"
-                    , PC, instrct, instrct);
-                $display("%02s  %08s   |  io in  dev[%03b] -> r%1d (rd = %3d)"
-                    , "", "", idx, rd, din);
+                $display("%02s  %08s   |  add r%1d r%1d  r%1d (r%1d -> %3d)"
+                    , "", "", rd, rs1, rs2, rd, add_result);
             end
-        end
-        2'b10: begin //! li
-            $display("%02d: %08b  %02x  li rd imm << s"
-                , PC, instrct, instrct);
-            $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %3d)"
-                , "", "", rd, imm, s, rd, imm << s);
+            2'b01: begin //! io
+                if (io_out) begin
+                    $display("%02d: %08b  %02x  io out rd -> dev[idx]"
+                        , PC, instrct, instrct);
+                    $display("%02s  %08s   |  io out r%1d -> dev[%03b] (dev[%03b] = %3d)"
+                        , "", "", rd, idx, idx, doutb);
 
-            // $display("waddr = %1d din = %3d", waddr, din);
-        end
-        2'b11: begin //! bner0
-            if (PC < 16) begin
+                    // $display("raddrb = %1d doutb = %3d", raddrb, doutb);
+                end else begin
+                    $display("%02d: %08b  %02x  io in  dev[idx] -> rd"
+                        , PC, instrct, instrct);
+                    $display("%02s  %08s   |  io in  dev[%03b] -> r%1d (rd = %3d)"
+                        , "", "", idx, rd, din);
+                end
+            end
+            2'b10: begin //! li
+                $display("%02d: %08b  %02x  li rd imm << s"
+                    , PC, instrct, instrct);
+                $display("%02s  %08s   |  li r%1d %3d << %1d (r%1d -> %3d)"
+                    , "", "", rd, imm, s, rd, imm << s);
+
+                // $display("waddr = %1d din = %3d", waddr, din);
+            end
+            2'b11: begin //! bner0
                 $display("%02d: %08b  %02x  bner0 rs2 offset"
                     , PC, instrct, instrct);
                 $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
                     , "", "", rs2, offset_s, douta, doutb, next_PC);
             end
-        end
-    endcase
+        endcase
+    end
 end
 
 endmodule
