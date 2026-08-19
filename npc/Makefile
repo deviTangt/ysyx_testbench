@@ -6,19 +6,13 @@ INC_PATH = cinc/
 VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc  \
 				-O3 --x-assign fast --x-initial fast --noassert
-# VERILATOR_BUILD = --cc --exe --build -j 0 
-# VERILATOR_WARN = -Wall
-# TOP_MODULE = vsrc/top
-# TESTBENCH = csrc/main.cpp
-# #BUILD_DIR = obj_dir
-# EXECUTABLE = $(BUILD_DIR)/V$(TOP_MODULE)
-
+VERILATOR_CHECK = --lint-only
 
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
-
-default: $(BIN)
+OBJ_DIR_TB = $(BUILD_DIR)/obj_dir_tb
+TB = $(BUILD_DIR)/$(TOPNAME)_tb
 
 # create ./build if non exist
 $(shell mkdir -p $(BUILD_DIR))
@@ -32,13 +26,14 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
+TSRCS = $(shell find $(abspath ./test_bench) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
 # rules for NVBoard
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 # rules for verilator
 INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+CXXFLAGS = $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
@@ -49,10 +44,18 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
 		--trace-fst
 
+$(TB): $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR_TB)
+	$(VERILATOR) $(VERILATOR_CFLAGS) \
+		--top-module $(TOPNAME) $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE) \
+		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
+		--Mdir $(OBJ_DIR_TB) --exe -o $(abspath $(TB)) \
+		--trace-fst
 
-all:
-	@echo "Write this Makefile by your self."
-	default
+default: $(BIN)
+
+all: default
+	@echo "Write this Makefile by your self. Default"
 
 # 仿真
 sim: $(BIN)
@@ -60,19 +63,26 @@ sim: $(BIN)
 	@echo "Write this Makefile by your self."
 	@$^
 
-# 	verilator $(VERILATOR_BUILD) --trace-fst $(TESTBENCH) $(TOP_MODULE)
-# 	obj_dir/Vtop
+# validate check
+check: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CHECK) $^
 
 run: $(BIN)
 	@$^
 
+tb: $(TB)
+	@echo "Work on Testbench"
+	@$^
+
 # 清理目标
-clean:
+clean: 
 	rm -rf $(BUILD_DIR)
 
 # 打开GTK文件
 gtk:
 	gtkwave wave.fst
 
+
 include ../Makefile
-.PHONY: default all clean run
+.PHONY: default all sim check run tb clean gtk
