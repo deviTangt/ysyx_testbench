@@ -158,8 +158,8 @@ Reg #(8, 8'd0) R_seg(sys_clk, sys_rst, doutb, io_seg_r, out_seg);
 bcd7seg_AF ins_seg1(.b(io_seg_r[7:4]), .h(seg1), .en(1'b1));
 bcd7seg_AF ins_seg0(.b(io_seg_r[3:0]), .h(seg0), .en(1'b1));
 
-assign sw_in = sw[7:0];
-assign btn_in = {3'd0, btn[4:0]};
+assign sw_in = {4'd0, sw[7:4]};
+assign btn_in = {4'd0, sw[3:0]};
 
 //? li
 assign imm_8b = ({6'd0, imm} << s);
@@ -182,6 +182,7 @@ bcd7seg_AF ins_seg2(.b(4'd0), .h(seg2), .en(1'd0));
 
 localparam PC_TRACE_MAX = 16;
 wire signed [3:0] offset_s = offset;
+wire signed [7:0] off_ext_s = off_ext;
 always@(posedge sys_clk) begin
     if (PC < PC_TRACE_MAX) begin
         case(instruct_type)
@@ -219,6 +220,8 @@ always@(posedge sys_clk) begin
                     , PC, instrct, instrct);
                 $display("%02s  %08s   |  bner0 r%1d  %6d (%3d - %3d : PC -> %2d)"
                     , "", "", rs2, offset_s, douta, doutb, next_PC);
+
+                $display("bne0 = %1d off_ext = %2d next_PC = %02d", bne0, off_ext_s, next_PC);
             end
         endcase
     end
