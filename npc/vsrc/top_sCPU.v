@@ -116,6 +116,9 @@ assign din = in_btn ? btn_in : din_p2;
 assign raddra = type_bner0 ? 2'd0 : rs1;
 assign raddrb = io_out ? rd : rs2;
 
+assign waddr = rd;
+assign wen = type_add | type_li | io_in;
+
 //? Instrucions
 assign instrct = rom_PC[PC];
 assign instruct_type = instrct[7:6];
