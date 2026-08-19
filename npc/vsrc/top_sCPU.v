@@ -166,8 +166,10 @@ assign imm_8b = ({6'd0, imm} << s);
 
 //? bner0
 assign off_ext = {{4{offset[3]}}, offset};
+assign bne0 = douta != doutb;
 
 
+//! DEBUG
 assign ledr[15] = sys_clk;
 assign ledr[14] = sys_rst;
 
