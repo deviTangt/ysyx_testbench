@@ -1,13 +1,14 @@
 module bcd7seg_AF(
     input      [3:0] b,
-    output     [7:0] h
+    output     [7:0] h,
+    input en
 );
 
 wire b3,b2,b1,b0;
 assign {b3,b2,b1,b0} = b;
 
 wire [7 : 0] y;
-assign h = ~y;
+assign h = en ? ~y : 8'hff;
 
 MuxKeyWithDefault #(16, 4, 8) i0 (y, b, 8'h00, {
     4'd0,  8'b1111_1100,
