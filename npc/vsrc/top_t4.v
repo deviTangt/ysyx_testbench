@@ -42,6 +42,9 @@ assign lfsr_n[6:0] = lfsr[7:1];
 assign lfsr_n[7] = lfsr_n[4] ^ lfsr_n[3] ^ lfsr_n[2] ^ lfsr_n[0];
 Reg #(8, 8'd1) r0 (clk, rst, lfsr_n, lfsr, 1'b1);
 
+reg [7:0] led_buf;
+Reg #(8, 8'd1) r1 (clk, rst, led_buf + 8'd1, led_buf, btn_pos[0]);
+assign ledr[7:0] = led_buf; 
 
 //output debuginfo to bcd
 bcd7seg ins_seg7(.b(4'd14), .h(seg7));
