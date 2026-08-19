@@ -34,11 +34,12 @@ module top(
 
 ////----------- Parameters ------------////
 reg sys_clk;
+wire sys_rst;
 reg  [4:0] btn_p;
 Reg #(5, 5'd0) r_btn (clk, rst, btn, btn_p, 1'b1);
 wire [4:0] btn_pos = ~btn_p & btn;
 Reg #(1, 1'd0) r_sysclk (clk, rst, ~sys_clk, sys_clk, btn_pos[4]);
-wire sys_rst = btn[2] | rst;
+assign sys_rst = btn[2] | rst;
 
 //? PC
 reg [7:0] rom_PC [255:0];
@@ -161,6 +162,7 @@ assign off_ext = {{4{offset[3]}}, offset};
 
 
 assign ledr[15] = sys_clk;
+assign ledr[14] = sys_rst;
 
 wire [7:0] PC_w1 = PC / 10 % 10;
 wire [7:0] PC_w0 = PC % 10;
