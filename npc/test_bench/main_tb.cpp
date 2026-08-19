@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
   int err_cnt = 0;
   
   int cnt_loop = 0;
-  while (1) {
+  while (1 && err_cnt < 20) {
     top->sw = ((num1 & 0xf) << 4) | (num2 & 0xf);
     top->btn = 0;
 
@@ -104,8 +104,6 @@ int main(int argc, char** argv) {
         printf("Fin Check, ERR Total: %d\r\n", err_cnt);
 
         err_cnt = 10000;
-
-        break;
       }else 
         num1 += 1; 
       num2 = -7;
