@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     tfp->open("wave.fst");     // 输出 FST 文件
   #endif
 
-  int num1 = -7, num2 = -7, res, n2_no_cin, cin;
+  int num1 = -8, num2 = -8, res, n2_no_cin, cin;
   int rd_res, rd_f_zero, rd_f_of, rd_f_carry;
   int f_zero, f_of, f_carry;
   int op_code = 0;
@@ -104,6 +104,8 @@ int main(int argc, char** argv) {
         printf("Fin Check, ERR Total: %d\r\n", err_cnt);
 
         err_cnt = 10000;
+
+        break;
       }else 
         num1 += 1; 
       num2 = -7;
