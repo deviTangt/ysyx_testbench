@@ -55,6 +55,11 @@ int main(int argc, char** argv) {
       tfp->dump(contextp->time()); // 把当前时刻写入波形
       contextp->timeInc(1);        // 仿真时间前进 1
     #endif
+
+    if (top->uart_tx){
+      printf("\r\nSim Finish...\r\n");
+      break;
+    }
     
     cnt_loop ++;
   }
