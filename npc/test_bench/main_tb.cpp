@@ -8,166 +8,165 @@
 
 Vtop* top;
 
-static void single_cycle() {
-  top->clk = 0; top->eval();
-  top->clk = 1; top->eval();
-}
-
-static void reset(int n) {
-  top->rst = 1;
-  while (n > 0) {
-    single_cycle();
-    n --;
-  }
-  top->rst = 0;
-}
+static void dut_single_cycle();
+static void dut_reset(int n);
 
 #define WAVE_TRACE 1
+int cnt_loop = 0;
+
+uint8_t rom_PC[256] = {
+  0x91, 0xa1, 0x58, 0x69, 0x81, 0x71, 0xf3, 0x87, 0xb6, 0x03, 0xb1, 0x17, 0x29, 0xe5, 0x58, 0x69,
+  0xc3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+uint8_t PC;
+int8_t  ram_GPR[4];
+
+uint8_t instruct;
+uint8_t instruct_type;
+
+uint8_t led, seg;
+
+void ref_reset(){
+  PC = 0;
+  for (uint8_t i = 0;i < 4;i ++){
+    ram_GPR[i] = 0;
+  }
+  led = seg = 0;
+}
+
+int check_regs(uint8_t *dut_regs, uint8_t *ref_regs){
+  uint8_t cnt_err = 0;
+  for (uint8_t i = 0;i < 4;i ++){
+    if (dut_regs[i] != ref_regs[i]){
+      cnt_err ++;
+    }
+  }
+  if (cnt_err){
+    return 1;
+  }
+  return 0;
+}
+
+void ref_inst_cycle(){
+  instruct = rom_PC[PC];
+  instruct_type = ((instruct & 0xc0) >> 6) & 0x03;
+  switch(instruct_type){
+    case 0:{ //? add
+      uint8_t rd  = ((instruct & 0x30) >> 4) & 0x03;
+      uint8_t rs1 = ((instruct & 0x0c) >> 2) & 0x03;
+      uint8_t rs2 = ((instruct & 0x03) >> 0) & 0x03;
+
+      int8_t val_rs1 = ram_GPR[rs1];
+      int8_t val_rs2 = ram_GPR[rs2];
+      ram_GPR[rd] = val_rs1 + val_rs2;
+
+      PC = PC + 1;
+    }break;
+    case 1:{ //? io
+      uint8_t rd  = ((instruct & 0x30) >> 4) & 0x03;
+      uint8_t i_o = ((instruct & 0x08) >> 3) & 0x01;
+      uint8_t idx = ((instruct & 0x07) >> 0) & 0x07;
+
+      if (i_o){ //? io out
+        if (idx == 0b000){
+          led = ram_GPR[rd];
+        }
+        else if (idx == 0b001){
+          seg = ram_GPR[rd];
+        }
+      }
+      else{ //? io in
+        if (idx == 0b000){ // sw
+          ram_GPR[rd] = 0x00;
+        }
+        else if (idx == 0b001){ // btn
+          ram_GPR[rd] = 0x01;
+        }
+      }
+
+      PC = PC + 1;
+    }break;
+    case 2:{ //? li
+      uint8_t rd  = ((instruct & 0x30) >> 4) & 0x03;
+      uint8_t s   = ((instruct & 0x0c) >> 2) & 0x03;
+      uint8_t imm = ((instruct & 0x03) >> 0) & 0x03;
+      
+      ram_GPR[rd] = (uint8_t)(imm << s);
+
+      PC = PC + 1;
+    }break;
+    case 3:{ //? bner0
+      uint8_t offset = ((instruct & 0x3c) >> 2) & 0x0f;
+      uint8_t rs2    = ((instruct & 0x03) >> 0) & 0x03;
+
+      int8_t off_ext = (offset >= 8) ? 0xf0 | offset : offset;
+
+      PC = PC + off_ext;
+    }break;
+    default: break;
+  }
+}
 
 int main(int argc, char** argv) {
   VerilatedContext* contextp = new VerilatedContext;
   contextp->commandArgs(argc, argv);
-
   top = new Vtop{contextp};
 
   printf("\r\nHello, ysyx! TB\r\n");
-
-  reset(10);
+  dut_reset(10);
   
-  // 开启波形记录
-  #if WAVE_TRACE
-    Verilated::traceEverOn(true);
-    
-    VerilatedFstC* tfp = new VerilatedFstC;
-    top->trace(tfp, 99);       // 99 表示记录 99 层层次
-    tfp->open("wave.fst");     // 输出 FST 文件
-  #endif
-
-  #define IN_MAX 7
-  #define IN_MIN -8
-  int num1 = IN_MIN, num2 = IN_MIN, out_val, res, n2_no_cin, cin, unum1, unum2;
-  int rd_res, rd_f_zero, rd_f_of, rd_f_carry;
-  int f_zero, f_of, f_carry;
-  uint8_t op_code = 0 ;
-  int err_cnt = 0;
-
-  for (uint8_t i = 0;i < op_code;i ++){
-    top->btn = 0x00;
-    single_cycle();
-    top->btn = 0x10;
-    single_cycle();
-    top->btn = 0x00;
-    single_cycle();
-    single_cycle();
-  }
+  top->btn = 0x01;
   
-  int cnt_loop = 0;
-  while (1 && err_cnt < 20) {
-    top->sw = ((num1 & 0xf) << 4) | (num2 & 0xf);
-    top->btn = 0;
-
-    single_cycle();
-
-    #if WAVE_TRACE
-      tfp->dump(contextp->time()); // 把当前时刻写入波形
-      contextp->timeInc(1);        // 仿真时间前进 1
-    #endif
-
-    //? caculate
-    cin = (op_code != 0);
-    n2_no_cin = cin ? (~num2 & 0xf) : (num2);
-    unum1 = (uint8_t)num1 & 0xf; 
-    if (op_code == 0)
-      unum2 = (uint8_t)num2 & 0xf; 
-    else
-      unum2 = num2 ? ((uint8_t)-num2) & 0xf : IN_MAX - IN_MIN + 1; 
-
-    out_val = num1 + n2_no_cin + cin;
-    switch(op_code){
-      case 0: res = (num1 + n2_no_cin + cin) & 0xf; 
-              break;
-      case 1: res = (num1 + n2_no_cin + cin) & 0xf; 
-              break;
-      case 2: res = (~num1) & 0xf; 
-              break;
-      case 3: res = (num1 & num2) & 0xf; 
-              break;
-      case 4: res = (num1 | num2) & 0xf; 
-              break;
-      case 5: res = (num1 ^ num2) & 0xf; 
-              break;
-      case 6: res = (num1 < num2) & 0xf; 
-              break;
-      case 7: res = (num1 == num2) & 0xf; 
-              break;
-      default: res = (num1 + n2_no_cin + cin) & 0xf; 
-              break;
-    }
-    f_zero = (res != 0);
-    f_of = ((num1 & 0x8) == (n2_no_cin & 0x8)) && ((res & 0x8) != (num1 & 0x8));
-    f_carry = (unum1 + unum2 > IN_MAX - IN_MIN);
-
-    rd_f_zero = ((top->ledr & 0x40) == 0);
-    rd_f_of = ((top->ledr & 0x20) != 0);
-    rd_f_carry = ((top->ledr & 0x10) != 0);
-    rd_res = (top->ledr & 0xf);
-
-    //? check
-    #define ERR_MAX_TRACE 8
-    if (err_cnt < ERR_MAX_TRACE){
-      if (rd_f_zero != f_zero || (op_code < 2 && (rd_f_of != f_of || rd_f_carry != f_carry)) || rd_res != res){
-        printf("--------------------------\r\n");
-        printf("Error[%d] at %d + %d:  ldr:%02x\r\n", err_cnt, num1, num2, top->ledr & 0xff);
-        if (rd_f_zero != f_zero){
-          printf("Zero Error output %d, exactual %d\r\n", rd_f_zero, f_zero);
-        }
-        if (op_code < 2){
-          if (rd_f_of != f_of){
-            printf("Overflow Error output %d, exactual %d\r\n", rd_f_of, f_of);
-          }
-          if (rd_f_carry != f_carry){
-            printf("Carry Error output %d, exactual %d\r\n", rd_f_carry, f_carry);
-          }
-        }
-        if (rd_res != res){
-          printf("Result Error output %d, exactual %d\r\n", rd_res, res);
-        }
-        err_cnt += 1;
-      }
-    }
-
-
-    if (err_cnt < ERR_MAX_TRACE){
-      if (num2 == IN_MAX){
-        if (num1 == IN_MAX){
-          num1 = IN_MIN;
-
-          printf("Fin Check, ERR Total: %d\r\n", err_cnt);
-
-          err_cnt = 10000;
-        }else 
-          num1 += 1; 
-        num2 = IN_MIN;
-      }
-      else num2 += 1;
-    }
-    else{
-      printf("Fin Check, ERR Total: %d\r\n", err_cnt);
-
-      err_cnt = 10000;
-    }
+  while (1 && cnt_loop < 20) {
+    dut_single_cycle();
+    ref_inst_cycle();
+    top->rootp;
     
+    uint8_t *dut_regs = (uint8_t *)top->rootp->top__DOT__i_GPR__DOT__GPR;
+    uint8_t *ref_regs = (uint8_t *)ram_GPR;
+    int is_diff = check_regs(dut_regs, ref_regs);
+    if (is_diff) {
+      printf("ERR: GPR different\n");
+      printf("DUT: [0]%3d [1]%3d [2]%3d [3]%3d\r\n", dut_regs[0], dut_regs[1], dut_regs[2], dut_regs[3]);
+      printf("REF: [0]%3d [1]%3d [2]%3d [3]%3d\r\n", ref_regs[0], ref_regs[1], ref_regs[2], ref_regs[3]);
+      printf("Simulation stop\n");
+      break;
+    }
+      
     cnt_loop ++;
   }
-
-  #if WAVE_TRACE
-    tfp->close();
-    delete tfp;
-  #endif
 
   delete top;
   delete contextp;
   return 0;
+}
+
+static void dut_single_cycle() {
+  top->clk = 0; top->eval();
+  top->clk = 1; top->eval();
+}
+
+static void dut_reset(int n) {
+  top->rst = 1;
+  while (n > 0) {
+    dut_single_cycle();
+    n --;
+  }
+  top->rst = 0;
 }
 
 

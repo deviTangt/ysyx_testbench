@@ -193,7 +193,7 @@ localparam PC_TRACE_MAX = 16;
 wire signed [3:0] offset_s = offset;
 wire signed [7:0] off_ext_s = off_ext;
 always@(posedge sys_clk) begin
-    if (PC < PC_TRACE_MAX) begin
+    if (PC < PC_TRACE_MAX && ~rst) begin
         case(instruct_type)
             2'b00: begin //! add
                 $display("%02d: %08b  %02x  add rd rs1 rs2"

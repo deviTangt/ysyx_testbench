@@ -26,7 +26,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
-TSRCS = $(shell find $(abspath ./test_bench) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+TCSRCS = $(shell find $(abspath ./test_bench) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
 # rules for NVBoard
 include $(NVBOARD_HOME)/scripts/nvboard.mk
@@ -38,16 +38,18 @@ CXXFLAGS = $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR_TB)
 	@$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
 		--trace-fst
 
-$(TB): $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE)
+$(TB): $(VSRCS) $(TCSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
 	@rm -rf $(OBJ_DIR_TB)
 	@$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $(VSRCS) $(TSRCS) $(NVBOARD_ARCHIVE) \
+		--top-module $(TOPNAME) $(VSRCS) $(TCSRCS) $(NVBOARD_ARCHIVE) \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR_TB) --exe -o $(abspath $(TB)) \
 		--trace-fst
@@ -66,6 +68,7 @@ sim: $(BIN)
 # validate check
 check: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
+	@rm -rf $(OBJ_DIR_TB)
 	$(VERILATOR) $(VERILATOR_CHECK) $^
 
 run: $(BIN)
