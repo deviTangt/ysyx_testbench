@@ -148,7 +148,8 @@ ok
 000001ac <halt>:
     1ac:	00000337          	lui t1, 0x00000        # PATCHED: addr=0x001AC
     1b0:	1ac30313          	addi t1, t1, 428      # PATCHED: addr=0x001AC
-    1b4:	00030067          	jalr zero, 0(t1)       # infinite loop
+    1b4:	00000000        
+    1b8:	00030067          	jalr zero, 0(t1)       # infinite loop
 
 ============================================================
 KEY INSPECTION POINTS (halt at 0x001AC, sp=0x1000):

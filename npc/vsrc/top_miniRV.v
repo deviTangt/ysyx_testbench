@@ -80,10 +80,12 @@ wire is_MEM;
 wire mem_wen;
 wire mem_ren;
 wire byte_en3, byte_en2, byte_en1, byte_en0;
-wire [31:0] mem_din_byte8;
+wire [7:0] mem_din_byte8;
+wire [31:0] mem_din_byte8_ext32b;
 wire [31:0] mem_din;
 wire [31:0] mem_dout;
-wire [31:0] mem_dout_byte8;
+wire [7:0] mem_dout_byte8;
+wire [31:0] mem_dout_byte8_ext32b;
 wire [31:0] mem_out_val;
 
 //? Instrucions
@@ -141,6 +143,7 @@ assign gpr_raddra = rs1;
 assign gpr_raddrb = rs2;
 assign rs1_out    = gpr_douta;
 assign rs2_out    = gpr_doutb;
+assign gpr_waddr  = rd;
 assign gpr_wen = op_add | op_addi | op_lui | op_lw | op_lbu | op_jalr;
 assign gpr_din =  (op_lw | op_lbu) ? mem_out_val
                 : (op_lui) ? lui_setval
@@ -169,7 +172,7 @@ i_MEM(
   .dout(mem_dout) 
 );
 assign mem_addr = imm_add_rs1_32b;
-assign mem_addr_26b = imm_add_rs1_26b;
+assign mem_addr_26b = mem_addr[25:0];
 assign is_VGA = (| imm_add_rs1_32b[31:29]); // addr > 0x2000_0000
 assign is_MEM = ~is_VGA;
 assign mem_wen = is_MEM & (op_sw | op_sb);
@@ -178,16 +181,18 @@ assign byte_en3 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b11
 assign byte_en2 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b10);
 assign byte_en1 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b01);
 assign byte_en0 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b00);
-assign mem_din_byte8 =    (mem_addr_26b[1:0] == 2'b11) ? {rs2_out[0+: 8], 24'b0}
-                        : (mem_addr_26b[1:0] == 2'b10) ? {8'b0, rs2_out[0+: 8], 16'b0}
-                        : (mem_addr_26b[1:0] == 2'b01) ? {16'b0, rs2_out[0+: 8], 8'b0}
-                        : {24'b0, rs2_out[0+: 8]};
-assign mem_din = op_sb ? mem_din_byte8 : rs2_out;
-assign mem_dout_byte8 =   (mem_addr_26b[1:0] == 2'b11) ? {mem_dout[24+: 8], 24'b0}
-                        : (mem_addr_26b[1:0] == 2'b10) ? {8'b0, mem_dout[16+: 8], 16'b0}
-                        : (mem_addr_26b[1:0] == 2'b01) ? {16'b0, mem_dout[ 8+: 8], 8'b0}
-                        : {24'b0, mem_dout[0+: 8]};
-assign mem_out_val = op_lbu ? mem_dout_byte8 : mem_dout;
+assign mem_din_byte8 = rs2_out[7:0];
+assign mem_din_byte8_ext32b =     (mem_addr_26b[1:0] == 2'b11) ? {mem_din_byte8, 24'b0}
+                                : (mem_addr_26b[1:0] == 2'b10) ? {8'b0, mem_din_byte8, 16'b0}
+                                : (mem_addr_26b[1:0] == 2'b01) ? {16'b0, mem_din_byte8, 8'b0}
+                                : {24'b0, mem_din_byte8};
+assign mem_din = op_sb ? mem_din_byte8_ext32b : rs2_out;
+assign mem_dout_byte8 =   (mem_addr_26b[1:0] == 2'b11) ? mem_dout[24+:8]
+                        : (mem_addr_26b[1:0] == 2'b10) ? mem_dout[16+:8]
+                        : (mem_addr_26b[1:0] == 2'b01) ? mem_dout[ 8+:8]
+                        : mem_dout[0+:8];
+assign mem_dout_byte8_ext32b = {24'b0, mem_dout_byte8};
+assign mem_out_val = op_lbu ? mem_dout_byte8_ext32b : mem_dout;
 
 //? Instrucions
 assign instrct = rom_PC[PC_N];
@@ -201,9 +206,9 @@ assign rd       = instrct[11:7];
 assign imm_5b   = instrct[11:7];
 assign opcode   = instrct[6:0];
 
-assign op_addi  = (opcode == 7'h33);
-assign op_add   = (opcode == 7'h13);
-assign op_lui   = (opcode == 7'h55);
+assign op_addi  = (opcode == 7'h13);
+assign op_add   = (opcode == 7'h33);
+assign op_lui   = (opcode == 7'h37);
 assign op_lw    = (opcode == 7'h03 && funct3 == 3'h2);
 assign op_lbu   = (opcode == 7'h03 && funct3 == 3'h4);
 assign op_sw    = (opcode == 7'h23 && funct3 == 3'h2);
@@ -211,12 +216,15 @@ assign op_sb    = (opcode == 7'h23 && funct3 == 3'h0);
 assign op_jalr  = (opcode == 7'h67);
 
 assign imm_ext_32b_s = (op_sw | op_sb) 
-                        ? {{20{imm_12b[11]}}, imm_12b} 
-                        : {{20{imm_7b[6]}}, {imm_7b, imm_5b}};
+                        ? {{20{imm_7b[6]}}, {imm_7b, imm_5b}} 
+                        : {{20{imm_12b[11]}}, imm_12b};
+assign imm_add_rs1_32b = imm_ext_32b_s + rs1_out;
+assign imm_add_rs1_26b = imm_add_rs1_32b[25:0];
 
 //? ALU add & addi
 assign ALU_add_t1 = rs1_out;
 assign ALU_add_t2 = op_add ? rs2_out : imm_ext_32b_s;
+assign ALU_add_sum = ALU_add_t1 + ALU_add_t2;
 
 ////----------- Debug ------------////
 reg [23:0] cnt_clk;
@@ -236,73 +244,89 @@ bcd7seg_AF ins_seg2(.b( 4'd0 ), .h(seg2), .en( 1'd0 ));
 bcd7seg_AF ins_seg1(.b( 4'd0 ), .h(seg1), .en( 1'b0 ));
 bcd7seg_AF ins_seg0(.b( 4'd0 ), .h(seg0), .en( 1'b0 ));
 
-localparam PC_TRACE_MAX = 16;
+localparam PC_TRACE_MAX = 'h1b0;
+localparam PC_N_TRACE_MAX = 200;
 wire work_fin;
-assign work_fin = PC_N >= PC_TRACE_MAX;
+assign work_fin = (( 0 ) ? PC_N > PC_TRACE_MAX / 4 : PC_N > PC_N_TRACE_MAX) | (instrct == 32'h0);
 assign uart_tx = work_fin; 
+
+wire signed [31:0] gpr_din_ss = gpr_din;
+wire signed [31:0] imm_ext_32b_ss = imm_ext_32b_s;
 
 always@(posedge sys_clk) begin
     if (~work_fin && ~sys_rst) begin
         if (op_add) begin
-            $display("%03d: %08h  | add rd,rs1,rs2"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | add r%1d,r%1d ,r%1d  (r%1d -> %3d = r%1d[%3d] + r%1d[%3d])"
-                , "", "", rd, rs1, rs2, rd, gpr_din, rs1, rs1_out, rs2, rs2_out);
+            $display("%03d-%3x %08h  | add  rd  ,rs1,rs2"
+                    ,PC_N, PC, instrct); 
+            $display("%03s %3s %08s  - add  r%-2d ,r%-2d,r%-2d     {r%-2d -> 0x%h = r%-2d[0x%h] + r%-2d[0x%h]}"
+                , "", "", "", rd, rs1, rs2, rd, gpr_din, rs1, rs1_out, rs2, rs2_out);
        
         end else if (op_addi) begin
-            $display("%03d: %08h  | addi rd,rs1,imm"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | addi r%1d,r%1d ,%3d (r%1d -> %3d)"
-                , "", "", rd, rs1, imm_12b, rd, gpr_din);
+            $display("%03d-%3x %08h  | addi rd , rs1,imm"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - addi r%-2d, r%-2d,0x%3h   {r%-2d -> 0x%h or %d}"
+                , "", "", "", rd, rs1, imm_12b, rd, gpr_din, gpr_din_ss);
+
+            // $display("ALU_add_t1:%h, ALU_add_t2:%h"
+            //     ,ALU_add_t1, ALU_add_t2);
 
         end else if (op_lui) begin
-            $display("%03d: %08h  | lui rd, imm"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | lui rd, %5d (r%1d -> %3d)"
-                , "", "", rd, imm_20b, rd, gpr_din);
+            $display("%03d-%3x %08h  | lui  rd , imm"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - lui  r%-2d, %5h       {r%-2d -> 0x%h}"
+                , "", "", "", rd, imm_20b, rd, gpr_din);
 
         end else if (op_lw) begin
-            $display("%03d: %08h  | lw rd, offset(rs1)"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | lw r%1d, %6d(r%1d ) (M[%1d] -> %3d)"
-                , "", "", rd, imm_ext_32b_s, rs1, rs1_out, mem_din);
+            $display("%03d-%3x %08h  | lw   rd , offset(rs1)"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - lw   r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
+                , "", "", "", rd, imm_ext_32b_ss, rs1, rs1_out, mem_out_val);
         
         end else if (op_lbu) begin
-            $display("%03d: %08h  | lbu rd, offset(rs1)"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | lbu r%1d, %6d(r%1d ) (M[%1d] -> %3d))"
-                , "", "", rd, imm_ext_32b_s, rs1, rs1_out, mem_din);
+            $display("%03d-%3x %08h  | lbu  rd , offset(rs1)"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - lbu  r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
+                , "", "", "", rd, imm_ext_32b_ss, rs1, rd, mem_dout_byte8);
         
+            // $display("mem_addr:%h, mem_dout:%h, mem_out_val:%h"
+            //     ,mem_addr, mem_dout, mem_out_val);
+
         end else if (op_sw) begin
-            $display("%03d: %08h  | sw rs2, offset(rs1)"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | sw r%1d , %6d(r%1d ) (r%1d -> %3d)"
-                , "", "", rs2, imm_ext_32b_s, rs1, rs2, mem_out_val);
+            $display("%03d-%3x %08h  | sw   rs2, offset(rs1)"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - sw   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
+                , "", "", "", rs2, imm_ext_32b_ss, rs1, mem_addr, mem_din);
         
         end else if (op_sb) begin
-            $display("%03d: %08h  | sb rs2, offset(rs1)"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | sb r%1d , %6d(r%1d ) (r%1d -> %3d)"
-                , "", "", rs2, imm_ext_32b_s, rs1, rs2, mem_out_val);
+            $display("%03d-%3x %08h  | sb   rs2, offset(rs1)"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - sb   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
+                , "", "", "", rs2, imm_ext_32b_ss, rs1, mem_addr, mem_din_byte8);
         
+            // $display("mem_addr:%h, mem_din_byte8:%h"
+            //     ,mem_addr, mem_din_byte8);
+
         end else if (op_jalr) begin
-            $display("%03d: %08h  | jalr rd, offset(rs1)"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | jalr r%1d, %6d(r$d ) (r%1d -> %3d)"
-                , "", "", rd, imm_12b, rs1, rd, gpr_din);
+            $display("%03d-%3x %08h  | jalr rd , offset(rs1)"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - jalr r%-2d, %6d(r%2d) {r%1d -> 0x%h | PC -> %3h}"
+                , "", "", "", rd, imm_12b, rs1, rd, gpr_din, next_PC);
         
+            // $display("next_PC:%h, next_PC_jalr:%h, next_PC_jalr_ext32b_s:%h"
+            //     ,next_PC, next_PC_jalr, next_PC_jalr_ext32b_s);
+
         end else begin
-            $display("%03d: %08h  | Instruction err!!!"
-                    , PC_N, instrct);
-            $display("%03s  %08s  | funct3=%1d opcode=%3d"
-                , "", "", funct3, opcode);
+            $display("%03d-%3x %08h  | Instruction err!!!"
+                    ,PC_N, PC, instrct);
+            $display("%03s %3s %08s  - funct3=%1d opcode=%2h"
+                , "", "", "", funct3, opcode);
         end
     end
 end
 
 always@(posedge clk) begin
     if (btn_neg0[0]) begin
-        $display("Cur PC:%03h PC_N:%3d Ins:%8h", PC, PC_N, instrct);
+        $display("Cur PC:%03h PC_N:0x%h Ins:0x%h", PC,PC_N, PC, instrct);
     end
 end
 

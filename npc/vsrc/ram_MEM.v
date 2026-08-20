@@ -37,8 +37,8 @@ always@(posedge clk) begin
 end
 
 assign dout[24+:8] = (ren & byte_en3) ? R_MEM[addr][24+:8] : 0;
-assign dout[16+:8] = (ren & byte_en3) ? R_MEM[addr][16+:8] : 0;
-assign dout[ 8+:8] = (ren & byte_en3) ? R_MEM[addr][ 8+:8] : 0;
-assign dout[ 0+:8] = (ren & byte_en3) ? R_MEM[addr][ 0+:8] : 0;
+assign dout[16+:8] = (ren & byte_en2) ? R_MEM[addr][16+:8] : 0;
+assign dout[ 8+:8] = (ren & byte_en1) ? R_MEM[addr][ 8+:8] : 0;
+assign dout[ 0+:8] = (ren & byte_en0) ? R_MEM[addr][ 0+:8] : 0;
 
 endmodule
