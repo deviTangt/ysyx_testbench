@@ -8,4 +8,7 @@
 !*.cc
 !*.cpp
 !.gitignore
+!*.hex
+!*.txt
+!*.nxdc
 !README.md

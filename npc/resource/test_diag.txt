@@ -1,0 +1,168 @@
+﻿Disassembly of section .text:
+
+
+00000000 <_start>:
+      0:	00001137          	lui sp, 0x1            # sp = 0x1000
+      4:	00010113          	addi sp, sp, 0         # sp stays 0x1000
+                                          # --- TEST 1: lbu zero-extension (MOST CRITICAL) ---
+
+00000008 <t1_lbu>:
+      8:	0ff00313          	addi t1, zero, 0xFF    # t1 = 255
+      c:	00610023          	sb t1, 0(sp)           # [sp+0].byte0 = 0xFF
+     10:	08000313          	addi t1, zero, 0x80    # t1 = 128
+     14:	006100a3          	sb t1, 1(sp)           # [sp+1].byte0 = 0x80
+     18:	07f00313          	addi t1, zero, 0x7F    # t1 = 127
+     1c:	00610123          	sb t1, 2(sp)           # [sp+2].byte0 = 0x7F
+     20:	00014283          	lbu t0, 0(sp)          # t0 = lbu(0xFF)
+     24:	00114303          	lbu t1, 1(sp)          # t1 = lbu(0x80)
+     28:	00214383          	lbu t2, 2(sp)          # t2 = lbu(0x7F)
+     2c:	00512223          	sw t0, 4(sp)           # [0x1004] expect: 0x000000FF
+     30:	00612423          	sw t1, 8(sp)           # [0x1008] expect: 0x00000080
+     34:	00712623          	sw t2, 12(sp)          # [0x100C] expect: 0x0000007F
+                                          # *** CRITICAL: sum = 0x1FE (correct) or 0xFFFFFFFE (lbu bug)
+     38:	006282b3          	add t0, t0, t1         # t0 = lbu(0xFF)+lbu(0x80)
+     3c:	007282b3          	add t0, t0, t2         # t0 += lbu(0x7F)
+     40:	00512823          	sw t0, 16(sp)          # [0x1010] CHECK THIS!
+                                          # --- TEST 2: sb byte isolation ---
+
+00000044 <t2_sb>:
+     44:	12345337          	lui t1, 0x12345        # t1 = 0x12345000
+     48:	67830313          	addi t1, t1, 0x678     # t1 = 0x12345678
+     4c:	02612023          	sw t1, 32(sp)          # [0x1020] = 0x12345678
+     50:	0ab00393          	addi t2, zero, 0xAB    # t2 = 0xAB
+     54:	02710023          	sb t2, 32(sp)          # overwrite byte0 -> 0x123456AB
+     58:	02012283          	lw t0, 32(sp)          # t0 = should be 0x123456AB
+     5c:	02512223          	sw t0, 36(sp)          # [0x1024]
+     60:	02014283          	lbu t0, 32(sp)         # byte0: expect 0xAB
+     64:	02114303          	lbu t1, 33(sp)         # byte1: expect 0x56
+     68:	02214383          	lbu t2, 34(sp)         # byte2: expect 0x34
+     6c:	02314183          	lbu gp, 35(sp)         # byte3: expect 0x12
+     70:	02512423          	sw t0, 40(sp)          # [0x1028]
+     74:	02612623          	sw t1, 44(sp)          # [0x102C]
+     78:	02712823          	sw t2, 48(sp)          # [0x1030]
+     7c:	02312a23          	sw gp, 52(sp)          # [0x1034]
+                                          # --- TEST 3: addi sign extension ---
+
+00000080 <t3_addi>:
+     80:	00000293          	addi t0, zero, 0       # t0 = 0
+     84:	00100313          	addi t1, zero, 1       # t1 = 1
+     88:	7ff00393          	addi t2, zero, 0x7FF   # t2 = 2047
+     8c:	80000193          	addi gp, zero, 0x800   # gp = -2048
+     90:	fff00213          	addi tp, zero, 0xFFF   # tp = -1
+     94:	04512023          	sw t0, 64(sp)          # [0x1040] = 0
+     98:	04612223          	sw t1, 68(sp)          # [0x1044] = 1
+     9c:	04712423          	sw t2, 72(sp)          # [0x1048] = 2047
+     a0:	04312623          	sw gp, 76(sp)          # [0x104C] = 0xFFFFF800
+     a4:	04412823          	sw tp, 80(sp)          # [0x1050] = 0xFFFFFFFF
+     a8:	fff30313          	addi t1, t1, 0xFFF     # t1 = 1 + (-1) = 0
+     ac:	04612a23          	sw t1, 84(sp)          # [0x1054] = 0
+                                          # --- TEST 4: sw/lw negative offsets ---
+
+000000b0 <t4_offset>:
+     b0:	0aaaa337          	lui t1, 0xAAAA         # t1 = 0xAAAA000
+     b4:	55530313          	addi t1, t1, 0x555     # t1 = 0xAAAA555
+     b8:	10612023          	sw t1, 256(sp)
+     bc:	10012383          	lw t2, 256(sp)
+     c0:	06712023          	sw t2, 96(sp)          # [0x1060]
+     c4:	0bbbb337          	lui t1, 0xBBBB
+     c8:	fe612823          	sw t1, -16(sp)
+     cc:	ff012383          	lw t2, -16(sp)
+     d0:	06712223          	sw t2, 100(sp)         # [0x1064]
+     d4:	0cccc337          	lui t1, 0xCCCC
+     d8:	fe612e23          	sw t1, -4(sp)
+     dc:	ffc12383          	lw t2, -4(sp)
+     e0:	06712423          	sw t2, 104(sp)         # [0x1068]
+                                          # --- TEST 5: 4x sb then lw (word from bytes) ---
+
+ok
+000000e4 <t5_sb_lw>:
+     e4:	07800313          	addi t1, zero, 0x78    # byte0
+     e8:	08610023          	sb t1, 128(sp)
+     ec:	05600313          	addi t1, zero, 0x56    # byte1
+     f0:	086100a3          	sb t1, 129(sp)
+     f4:	03400313          	addi t1, zero, 0x34    # byte2
+     f8:	08610123          	sb t1, 130(sp)
+     fc:	01200313          	addi t1, zero, 0x12    # byte3
+    100:	086101a3          	sb t1, 131(sp)
+    104:	08012283          	lw t0, 128(sp)         # expect: 0x12345678
+    108:	06512823          	sw t0, 112(sp)         # [0x1070]
+    10c:	08014303          	lbu t1, 128(sp)        # byte0: 0x78
+    110:	08114383          	lbu t2, 129(sp)        # byte1: 0x56
+    114:	08214283          	lbu t0, 130(sp)        # byte2: 0x34
+    118:	08314183          	lbu gp, 131(sp)        # byte3: 0x12
+    11c:	06612a23          	sw t1, 116(sp)         # [0x1074]
+    120:	06712c23          	sw t2, 120(sp)         # [0x1078]
+    124:	06512e23          	sw t0, 124(sp)         # [0x107C]
+    128:	08312223          	sw gp, 132(sp)         # [0x1084]
+                                          # --- TEST 6: lui ---
+
+ok
+0000012c <t6_lui>:
+    12c:	123452b7          	lui t0, 0x12345        # t0 = 0x12345000
+    130:	00001337          	lui t1, 0x00001        # t1 = 0x00001000
+    134:	fffff3b7          	lui t2, 0xFFFFF        # t2 = 0xFFFFF000
+    138:	000001b7          	lui gp, 0x00000        # gp = 0
+    13c:	10512023          	sw t0, 256(sp)         # [0x1100] = 0x12345000
+    140:	10612223          	sw t1, 260(sp)         # [0x1104] = 0x00001000
+    144:	10712423          	sw t2, 264(sp)         # [0x1108] = 0xFFFFF000
+    148:	10312623          	sw gp, 268(sp)         # [0x110C] = 0
+                                          # --- TEST 7: add ---
+
+ok
+0000014c <t7_add>:
+    14c:	06400293          	addi t0, zero, 100     # t0 = 100
+    150:	0c800313          	addi t1, zero, 200     # t1 = 200
+    154:	006282b3          	add t0, t0, t1         # t0 = 300
+    158:	10512823          	sw t0, 272(sp)         # [0x1110] = 300
+    15c:	fff00293          	addi t0, zero, -1      # t0 = -1
+    160:	00100313          	addi t1, zero, 1       # t1 = 1
+    164:	006282b3          	add t0, t0, t1         # t0 = 0
+    168:	10512a23          	sw t0, 276(sp)         # [0x1114] = 0
+    16c:	000002b3          	add t0, zero, zero     # t0 = 0
+    170:	10512c23          	sw t0, 280(sp)         # [0x1118] = 0
+    174:	fff00293          	addi t0, zero, -1      # t0 = -1
+    178:	005282b3          	add t0, t0, t0         # t0 = -2
+    17c:	10512e23          	sw t0, 284(sp)         # [0x111C] = 0xFFFFFFFE
+                                          # --- TEST 8: jalr jump and link ---
+
+ok
+00000180 <t8_jalr>:
+    180:	000003b7          	lui t2, 0x00000        # PATCHED: addr=0x00194
+    184:	19438393          	addi t2, t2, 404      # PATCHED: addr=0x00194
+    188:	000380e7          	jalr ra, 0(t2)         # jump to target
+    18c:	00bad2b7          	lui t0, 0xBAD          # ERROR: should not reach
+    190:	00028067          	jalr zero, 0(t0)       # dead end
+
+ok
+00000194 <t8_target>:
+    194:	12112023          	sw ra, 288(sp)         # [0x1120] = return addr
+    198:	000003b7          	lui t2, 0x00000        # PATCHED: addr=0x001A4
+    19c:	1a438393          	addi t2, t2, 420      # PATCHED: addr=0x001A4
+    1a0:	00038067          	jalr zero, 0(t2)       # jump back
+
+ok
+000001a4 <t8_return>:
+    1a4:	0cafe337          	lui t1, 0xCAFE         # success marker
+    1a8:	12612223          	sw t1, 292(sp)         # [0x1124] = 0xCAFE000
+
+000001ac <halt>:
+    1ac:	00000337          	lui t1, 0x00000        # PATCHED: addr=0x001AC
+    1b0:	1ac30313          	addi t1, t1, 428      # PATCHED: addr=0x001AC
+    1b4:	00030067          	jalr zero, 0(t1)       # infinite loop
+
+============================================================
+KEY INSPECTION POINTS (halt at 0x001AC, sp=0x1000):
+
+  [0x1004] lbu(0xFF)  -> expect: 0x000000FF
+  [0x1008] lbu(0x80)  -> expect: 0x00000080
+  [0x1010] *** SUM *** -> expect: 0x000001FE
+           (if 0xFFFFFFFE: lbu sign-extends BUG!)
+  [0x1024] sb test    -> expect: 0x123456AB
+  [0x104C] addi 0x800 -> expect: 0xFFFFF800
+  [0x1064] sw/lw -16  -> expect: 0xBBBB000
+  [0x1070] 4xsb->lw   -> expect: 0x12345678
+  [0x1100] lui 0x12345-> expect: 0x12345000
+  [0x1110] 100+200    -> expect: 300
+  [0x1114] -1+1       -> expect: 0
+  [0x1124] jalr ok    -> expect: 0xCAFE000
+
