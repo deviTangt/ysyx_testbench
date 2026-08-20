@@ -439,8 +439,7 @@ void Vtop___024root__trace_chg_0_sub_0(Vtop___024root* vlSelf, VerilatedFst::Buf
                                                   : (IData)(vlSelfRef.top__DOT__add_result))))),8);
     bufp->chgCData(oldp+542,(vlSelfRef.top__DOT__i_GPR__DOT__R0__DOT__din),8);
     bufp->chgCData(oldp+543,((0x0000000fU & (IData)(vlSelfRef.sw))),8);
-    bufp->chgCData(oldp+544,((0x0000000fU & ((~ (IData)(vlSelfRef.btn)) 
-                                             & (IData)(vlSelfRef.top__DOT____Vcellout__r_btn4____pinNumber4)))),8);
+    bufp->chgCData(oldp+544,((0x0000000fU & (IData)(vlSelfRef.btn))),8);
 }
 
 void Vtop___024root__trace_chg_dtype____0(Vtop___024root* vlSelf, VerilatedFst::Buffer* bufp, uint32_t offset, const VlUnpacked<CData/*1:0*/, 4>& __VdtypeVar) {

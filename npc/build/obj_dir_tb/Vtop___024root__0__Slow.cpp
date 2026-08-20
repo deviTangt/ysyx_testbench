@@ -1267,8 +1267,7 @@ VL_ATTR_COLD void Vtop___024root___stl_sequent__TOP__0(Vtop___024root* vlSelf) {
     vlSelfRef.top__DOT__i_GPR__DOT__R0__DOT__din = 
         (0x000000ffU & (((1U == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                          & (IData)(vlSelfRef.top__DOT__io_in))
-                         ? (0x0000000fU & ((~ (IData)(vlSelfRef.btn)) 
-                                           & (IData)(vlSelfRef.top__DOT____Vcellout__r_btn4____pinNumber4)))
+                         ? (0x0000000fU & (IData)(vlSelfRef.btn))
                          : (((0U == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                              & (IData)(vlSelfRef.top__DOT__io_in))
                              ? (0x0000000fU & (IData)(vlSelfRef.sw))
@@ -1411,9 +1410,6 @@ VL_ATTR_COLD void Vtop___024root___ctor_var_reset(Vtop___024root* vlSelf) {
         vlSelf->top__DOT__rom_PC[__Vi0] = 0;
     }
     vlSelf->top__DOT__PC = 0;
-    for (int __Vi0 = 0; __Vi0 < 4; ++__Vi0) {
-        vlSelf->top__DOT__ram_GPR[__Vi0] = 0;
-    }
     vlSelf->top__DOT__rs1 = 0;
     vlSelf->top__DOT__rs2 = 0;
     vlSelf->top__DOT__io_out = 0;

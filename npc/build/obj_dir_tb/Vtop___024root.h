@@ -102,7 +102,6 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         QData/*39:0*/ top__DOT__i_GPR__DOT__sel_a__DOT__i0__DOT__lut;
         VlUnpacked<CData/*4:0*/, 5> top__DOT__btn_p;
         VlUnpacked<CData/*7:0*/, 256> top__DOT__rom_PC;
-        VlUnpacked<CData/*7:0*/, 4> top__DOT__ram_GPR;
         VlUnpacked<CData/*7:0*/, 4> top__DOT__i_GPR__DOT__GPR;
         VlUnpacked<SData/*9:0*/, 4> top__DOT__i_GPR__DOT__sel_b__DOT__i0__DOT__pair_list;
         VlUnpacked<CData/*1:0*/, 4> top__DOT__i_GPR__DOT__sel_b__DOT__i0__DOT__key_list;

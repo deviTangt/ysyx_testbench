@@ -101,8 +101,7 @@ bool Vtop___024root___eval_phase__ico(Vtop___024root* vlSelf) {
                         = (0x000000ffU & (((1U == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                                            & (IData)(vlSelfRef.top__DOT__io_in))
                                            ? (0x0000000fU 
-                                              & ((~ (IData)(vlSelfRef.btn)) 
-                                                 & (IData)(vlSelfRef.top__DOT____Vcellout__r_btn4____pinNumber4)))
+                                              & (IData)(vlSelfRef.btn))
                                            : (((0U 
                                                 == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                                                & (IData)(vlSelfRef.top__DOT__io_in))
@@ -1017,8 +1016,7 @@ void Vtop___024root___nba_sequent__TOP__0(Vtop___024root* vlSelf) {
     vlSelfRef.top__DOT__i_GPR__DOT__R0__DOT__din = 
         (0x000000ffU & (((1U == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                          & (IData)(vlSelfRef.top__DOT__io_in))
-                         ? (0x0000000fU & ((~ (IData)(vlSelfRef.btn)) 
-                                           & (IData)(vlSelfRef.top__DOT____Vcellout__r_btn4____pinNumber4)))
+                         ? (0x0000000fU & (IData)(vlSelfRef.btn))
                          : (((0U == (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_1)) 
                              & (IData)(vlSelfRef.top__DOT__io_in))
                              ? (0x0000000fU & (IData)(vlSelfRef.sw))
