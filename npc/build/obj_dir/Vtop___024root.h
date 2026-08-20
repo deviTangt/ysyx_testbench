@@ -43,33 +43,23 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         CData/*4:0*/ top__DOT____Vcellout__r_btn2____pinNumber4;
         CData/*4:0*/ top__DOT____Vcellout__r_btn3____pinNumber4;
         CData/*4:0*/ top__DOT____Vcellout__r_btn4____pinNumber4;
+        CData/*0:0*/ top__DOT__mem_wen;
         CData/*7:0*/ top__DOT__mem_dout_byte8;
         CData/*0:0*/ top__DOT__op_lw;
         CData/*0:0*/ top__DOT__op_lbu;
         CData/*0:0*/ top__DOT__op_sw;
         CData/*0:0*/ top__DOT__op_sb;
-        CData/*4:0*/ top__DOT__i_GPR__DOT__raddra;
-        CData/*4:0*/ top__DOT__i_GPR__DOT__raddrb;
-        CData/*4:0*/ top__DOT__i_GPR__DOT__waddr;
         CData/*0:0*/ top__DOT__i_GPR__DOT__wen;
         CData/*7:0*/ top__DOT__ins_seg6__DOT__i0__DOT__i0__DOT__lut_out;
         CData/*0:0*/ top__DOT__ins_seg6__DOT__i0__DOT__i0__DOT__hit;
         CData/*7:0*/ top__DOT__ins_seg7__DOT__i0__DOT__i0__DOT__lut_out;
         CData/*0:0*/ top__DOT__ins_seg7__DOT__i0__DOT__i0__DOT__hit;
-        CData/*0:0*/ top__DOT__i_MEM__DOT__ren;
-        CData/*0:0*/ top__DOT__i_MEM__DOT__byte_en3;
-        CData/*0:0*/ top__DOT__i_MEM__DOT__byte_en2;
-        CData/*0:0*/ top__DOT__i_MEM__DOT__byte_en1;
-        CData/*0:0*/ top__DOT__i_MEM__DOT__byte_en0;
         CData/*0:0*/ top__DOT__R_PC__DOT__rst;
-        CData/*6:0*/ __VdfgRegularize_h6e95ff9d_0_0;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_3;
-        CData/*2:0*/ __VdfgRegularize_h6e95ff9d_0_4;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_11;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_12;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_13;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_14;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_15;
+        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_2;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_3;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_4;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_5;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_7;
         CData/*0:0*/ __VstlFirstIteration;
         CData/*0:0*/ __VstlPhaseResult;
         CData/*0:0*/ __Vtrigprevexpr___TOP__clk__0;
@@ -80,20 +70,22 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         CData/*0:0*/ __Vtrigprevexpr___TOP__uart_rx__0;
         CData/*0:0*/ __VicoDidInit;
         CData/*0:0*/ __VicoPhaseResult;
-    };
-    struct {
         CData/*0:0*/ __Vtrigprevexpr___TOP__clk__1;
         CData/*0:0*/ __Vtrigprevexpr___TOP__top__DOT__R_PC__DOT__rst__0;
         CData/*0:0*/ __VactPhaseResult;
         CData/*0:0*/ __VnbaPhaseResult;
         VL_IN16(sw,15,0);
         VL_OUT16(ledr,15,0);
-        SData/*11:0*/ __VdfgRegularize_h6e95ff9d_0_8;
+        VL_OUT16(PC_N_o,15,0);
         SData/*15:0*/ __Vtrigprevexpr___TOP__sw__0;
+        VL_IN(instruct,31,0);
         IData/*17:0*/ top__DOT__PC;
+    };
+    struct {
         IData/*31:0*/ top__DOT__mem_addr;
+        IData/*31:0*/ top__DOT__mem_din;
+        IData/*31:0*/ top__DOT__mem_dout;
         IData/*31:0*/ top__DOT__mem_out_val;
-        IData/*19:0*/ top__DOT__imm_20b;
         IData/*31:0*/ top__DOT__imm_ext_32b_s;
         IData/*23:0*/ top__DOT__cnt_clk;
         IData/*31:0*/ top__DOT__i_GPR__DOT____Vcellout__foor_loop_i__BRA__0__KET____DOT__R____pinNumber4;
@@ -129,11 +121,11 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         IData/*31:0*/ top__DOT__i_GPR__DOT____Vcellout__foor_loop_i__BRA__30__KET____DOT__R____pinNumber4;
         IData/*31:0*/ top__DOT__i_GPR__DOT____Vcellout__foor_loop_i__BRA__31__KET____DOT__R____pinNumber4;
         IData/*31:0*/ top__DOT__i_GPR__DOT__foor_loop_i__BRA__0__KET____DOT__R__DOT__din;
-        IData/*31:0*/ top__DOT__i_MEM__DOT__din;
         IData/*17:0*/ top__DOT__R_PC__DOT__din;
+        IData/*31:0*/ __Vfunc_top__DOT__pmem_read__0__Vfuncout;
+        IData/*31:0*/ __Vtrigprevexpr___TOP__instruct__0;
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<CData/*4:0*/, 5> top__DOT__btn_p;
-        VlUnpacked<IData/*31:0*/, 65536> top__DOT__rom_PC;
         VlUnpacked<IData/*31:0*/, 32> top__DOT__i_GPR__DOT__GPR;
         VlUnpacked<SData/*11:0*/, 16> top__DOT__ins_seg0__DOT__i0__DOT__i0__DOT__pair_list;
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg0__DOT__i0__DOT__i0__DOT__key_list;
@@ -146,8 +138,6 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         VlUnpacked<CData/*7:0*/, 16> top__DOT__ins_seg2__DOT__i0__DOT__i0__DOT__data_list;
         VlUnpacked<SData/*11:0*/, 16> top__DOT__ins_seg3__DOT__i0__DOT__i0__DOT__pair_list;
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg3__DOT__i0__DOT__i0__DOT__key_list;
-    };
-    struct {
         VlUnpacked<CData/*7:0*/, 16> top__DOT__ins_seg3__DOT__i0__DOT__i0__DOT__data_list;
         VlUnpacked<SData/*11:0*/, 16> top__DOT__ins_seg4__DOT__i0__DOT__i0__DOT__pair_list;
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg4__DOT__i0__DOT__i0__DOT__key_list;
@@ -156,17 +146,18 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg5__DOT__i0__DOT__i0__DOT__key_list;
         VlUnpacked<CData/*7:0*/, 16> top__DOT__ins_seg5__DOT__i0__DOT__i0__DOT__data_list;
         VlUnpacked<SData/*11:0*/, 16> top__DOT__ins_seg6__DOT__i0__DOT__i0__DOT__pair_list;
+    };
+    struct {
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg6__DOT__i0__DOT__i0__DOT__key_list;
         VlUnpacked<CData/*7:0*/, 16> top__DOT__ins_seg6__DOT__i0__DOT__i0__DOT__data_list;
         VlUnpacked<SData/*11:0*/, 16> top__DOT__ins_seg7__DOT__i0__DOT__i0__DOT__pair_list;
         VlUnpacked<CData/*3:0*/, 16> top__DOT__ins_seg7__DOT__i0__DOT__i0__DOT__key_list;
         VlUnpacked<CData/*7:0*/, 16> top__DOT__ins_seg7__DOT__i0__DOT__i0__DOT__data_list;
-        VlUnpacked<IData/*31:0*/, 16777216> top__DOT__i_MEM__DOT__R_MEM;
         VlUnpacked<QData/*63:0*/, 1> __VstlTriggered;
         VlUnpacked<QData/*63:0*/, 2> __VicoTriggered;
         VlUnpacked<QData/*63:0*/, 1> __VactTriggered;
         VlUnpacked<QData/*63:0*/, 1> __VnbaTriggered;
-        VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
+        VlUnpacked<CData/*0:0*/, 3> __Vm_traceActivity;
     };
 
     // INTERNAL VARIABLES
