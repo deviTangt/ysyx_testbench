@@ -37,7 +37,8 @@ VM_PREFIX = Vtop
 VM_MODPREFIX = Vtop
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
-  -Icinc/ \
+  -I./cinc \
+  -I./csrc \
   -I/home/devi/ysyx/ysyx-workbench/nvboard/usr/include \
   -DTOP_NAME="Vtop" \
 
@@ -53,12 +54,14 @@ VM_USER_LDLIBS = \
 VM_USER_CLASSES = \
   auto_bind \
   main \
+  readf2mem \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
   .. \
   ../.. \
   ../../csrc \
+  ../../csrc/sub \
 
 ### Default rules...
 # Include list of all generated classes
@@ -72,6 +75,8 @@ VPATH += $(VM_USER_DIR)
 auto_bind.o: /home/devi/ysyx/ysyx-workbench/npc/build/auto_bind.cpp 
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST)  -c -o $@ $<
 main.o: /home/devi/ysyx/ysyx-workbench/npc/csrc/main.cpp 
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST)  -c -o $@ $<
+readf2mem.o: /home/devi/ysyx/ysyx-workbench/npc/csrc/sub/readf2mem.cpp 
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST)  -c -o $@ $<
 
 ### Link rules... (from --exe)
