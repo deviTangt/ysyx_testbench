@@ -129,11 +129,6 @@ wire [31:0] ALU_add_sum;
 Reg #(18, 18'd0) R_PC(sys_clk, sys_rst, next_PC, PC, 1'b1);
 assign PC_N = PC[17:2];
 assign PC_N_o = PC_N;
-assign next_PC = (op_jalr) ? next_PC_jalr : next_PC_norm;
-assign next_PC_norm = PC + 18'd4;
-
-assign next_PC_jalr = {imm_add_rs1_26b[17:1], 1'b0};
-assign next_PC_jalr_ext32b_s = {{14{next_PC_jalr[17]}}, next_PC_jalr};
 
 //? RAM GPR li
 ram_GPR_miniRV i_GPR(

@@ -16,9 +16,9 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at /home/devi/ysyx/ysyx-workbench/npc/vsrc/top_miniRV_npc.v:38:29
+    // DPI import at /home/devi/ysyx/ysyx-workbench/npc/vsrc/L4_SU.v:30:29
     extern int pmem_read(int raddr);
-    // DPI import at /home/devi/ysyx/ysyx-workbench/npc/vsrc/top_miniRV_npc.v:39:30
+    // DPI import at /home/devi/ysyx/ysyx-workbench/npc/vsrc/L4_SU.v:31:30
     extern void pmem_write(int waddr, int wdata, char mem_wmask);
 
 #ifdef __cplusplus

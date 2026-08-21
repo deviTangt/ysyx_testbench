@@ -3,7 +3,7 @@ module ram_GPR_miniRV(
   input wire [4:0] raddrb,
   input wire [31:0] din,
   input wire [4:0] waddr,
-  inout wire       wen,
+  input wire       wen,
   input wire       clk,
   input wire       rst,
 

@@ -30,13 +30,9 @@ module top(
     output wire [7:0]   seg6,
     output wire [7:0]   seg7,
 
-    input  wire [31:0]  instruct,
+    input  wire [31:0]  instruct_i,
     output wire [15:0]  PC_N_o
 );
-
-//? RAM GET 
-import "DPI-C" function int pmem_read(input int raddr);
-import "DPI-C" function void pmem_write(input int waddr, input int wdata, input byte mem_wmask);
 
 ////----------- Parameters ------------////
 reg sys_clk;
@@ -53,52 +49,11 @@ wire [4:0] btn_neg1 = btn_p[1] & ~btn;
 assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
 
-//? PC jalr
-// reg [31:0] rom_PC [65535:0];
-// initial begin
-//     $display("INFO: Trying load rom_PC");
-//     $readmemh("resource/test_diag.hex", rom_PC);
-//     $display("rom[0]=%h rom[1]=%h", rom_PC[0], rom_PC[1]);
-// end
+//? IFU
 reg  [17:0] PC;
-wire [15:0] PC_N;
-wire [17:0] next_PC;
-wire [17:0] next_PC_norm;
 
-wire [17:0] next_PC_jalr;
-wire [31:0] next_PC_jalr_ext32b_s;
-
-//? RAM GPR lui
-wire [4:0] gpr_raddra, gpr_raddrb;
-wire [31:0] gpr_douta, gpr_doutb;
-wire [4:0] gpr_waddr;
-wire gpr_wen;
-wire [31:0] gpr_din;
-
-wire [31:0] rs1_out, rs2_out;
-
-wire [31:0] lui_setval;
-
-//? RAM MEM lw & lbu & sw & sb
-wire [31:0] mem_addr;
-wire [25:0] mem_addr_26b;
-wire is_VGA;
-wire is_MEM;
-wire mem_wen;
-wire mem_ren;
-wire byte_en3, byte_en2, byte_en1, byte_en0;
-wire [7:0] mem_wmask;
-wire [7:0] mem_din_byte8;
-wire [31:0] mem_din_byte8_ext32b;
-wire [31:0] mem_din;
-reg [31:0] mem_dout;
-wire [7:0] mem_dout_byte8;
-wire [31:0] mem_dout_byte8_ext32b;
-wire [31:0] mem_out_val;
-
-//? Instrucions
-// wire [31:0] instruct;
-wire [6:0] opcode;
+//? DU
+wire [31:0] instruct;
 wire op_add;
 wire op_addi;
 wire op_lui;
@@ -108,147 +63,150 @@ wire op_sw;
 wire op_sb;
 wire op_jalr;
 
-wire [4:0] rs1, rs2, rd;
-wire [2:0] funct3;
+wire [31:0] rs1_out, rs2_out;
 wire [19:0] imm_20b;
 wire [11:0] imm_12b;
-wire [6:0] imm_7b;
-wire [4:0] imm_5b;
+wire [6:0]  imm_7b;
+wire [4:0]  imm_5b;
+
+
+//? XU
+wire gpr_wen;
+wire [31:0]  gpr_din;
+
+wire  [31:0] mem_addr;
+wire  [31:0] mem_din;
+wire         mem_wen;
+wire         mem_ren;
+wire  [3:0]  byte_en_4b; 
+
+wire [17:0] next_PC;
+
+wire gpr_wen_XU_o;
+wire [31:0] gpr_din_XU_o;
+
+//? SU
+wire [31:0] gpr_din_SU_o;
+
+wire [31:0] mem_out_val;
+
+//? BU
+wire gpr_wen_BU_i;
+wire gpr_wen_BU_o;
+wire [31:0] gpr_din_BU_o;
+
+//// debug
+wire [4:0] rs1, rs2, rd;
+wire [6:0] opcode;
+wire [2:0] funct3;
+
 wire [31:0] imm_ext_32b_s;
+wire [7:0] mem_din_byte8;
 
-wire [31:0] imm_add_rs1_32b;
-wire [25:0] imm_add_rs1_26b;
-
-//? ALU add & addi
-wire [31:0] ALU_add_t1;
-wire [31:0] ALU_add_t2;
-wire [31:0] ALU_add_sum;
+wire [7:0] mem_dout_byte8;
 
 ////----------- Logic ------------////
-//? PC jalr
-Reg #(18, 18'd0) R_PC(sys_clk, sys_rst, next_PC, PC, 1'b1);
+//? IFU
+L1_IFU i_L1_IFU(
+    .PC(PC),
+    .instruct(instruct),
+
+    .instruct_i(instruct_i),
+    .PC_N_o(PC_N_o)
+);
 assign PC_N = PC[17:2];
-assign PC_N_o = PC_N;
-assign next_PC = (op_jalr) ? next_PC_jalr : next_PC_norm;
-assign next_PC_norm = PC + 18'd4;
 
-assign next_PC_jalr = {imm_add_rs1_26b[17:1], 1'b0};
-assign next_PC_jalr_ext32b_s = {{14{next_PC_jalr[17]}}, next_PC_jalr};
+//? DU
+L2_DU i_L2_DU(
+    .clk(sys_clk), .rst(sys_rst),
+    .instruct(instruct),
 
-//? RAM GPR li
-ram_GPR_miniRV i_GPR(
-  .raddra(gpr_raddra),
-  .raddrb(gpr_raddrb),
-  .din(gpr_din),
-  .waddr(gpr_waddr),
-  .wen(gpr_wen),
-  .clk(sys_clk),
-  .rst(sys_rst),
+    .op_add(op_add), .op_addi(op_addi), .op_lui(op_lui), .op_lw(op_lw),
+    .op_lbu(op_lbu), .op_sw(op_sw), .op_sb(op_sb), .op_jalr(op_jalr),
+    
+    .rs1_out(rs1_out), .rs2_out(rs2_out),
+    .imm_20b(imm_20b), 
+    .imm_12b(imm_12b), 
+    .imm_7b(imm_7b), 
+    .imm_5b(imm_5b), 
+    
+    .wen(gpr_wen),
+    .wdata(gpr_din),
 
-  .douta(gpr_douta),
-  .doutb(gpr_doutb)
+    //// debug
+    .rs1(rs1), .rs2(rs2), .rd(rd),
+    .opcode(opcode),
+    .funct3(funct3)
 );
 
-assign gpr_raddra = rs1;
-assign gpr_raddrb = rs2;
-assign rs1_out    = gpr_douta;
-assign rs2_out    = gpr_doutb;
-assign gpr_waddr  = rd;
-assign gpr_wen = op_add | op_addi | op_lui | op_lw | op_lbu | op_jalr;
-assign gpr_din =  (op_lw | op_lbu) ? mem_out_val
-                : (op_lui) ? lui_setval
-                : (op_jalr) ? next_PC_jalr_ext32b_s
-                : ALU_add_sum;
+//? XU
+L3_XU i_L3_XU(
+    .clk(clk), 
+    .rst(rst),
 
-assign lui_setval = {imm_20b, 12'b0};
+    .op_add(op_add), .op_addi(op_addi), .op_lui(op_lui), .op_lw(op_lw),
+    .op_lbu(op_lbu), .op_sw(op_sw), .op_sb(op_sb), .op_jalr(op_jalr),
 
-//? RAM MEM lw & lbu & sw & sb
-// ram_MEM#(
-//   .ADDR_BIT ( 24 ),
-//   .IO_BIT   ( 32 )
-// ) 
-// i_MEM(
-//   .addr(mem_addr_26b[25:2]),
-//   .wen(mem_wen),
-//   .ren(mem_ren),
-//   .byte_en3(byte_en3),
-//   .byte_en2(byte_en2),
-//   .byte_en1(byte_en1),
-//   .byte_en0(byte_en0),
-//   .clk(sys_clk),
-//   .rst(sys_rst),
+    .rs1_out(rs1_out), .rs2_out(rs2_out),
+    .imm_20b(imm_20b), 
+    .imm_12b(imm_12b), 
+    .imm_7b(imm_7b), 
+    .imm_5b(imm_5b), 
 
-//   .din(mem_din),
-//   .dout(mem_dout) 
-// );
-assign mem_wmask = {4'd0, byte_en3, byte_en2, byte_en1, byte_en0};
-always @(*) begin
-  if (mem_ren | mem_wen) begin // 有读写请求时
-    mem_dout = pmem_read(mem_addr);
-    if (mem_wen) begin // 有写请求时
-      pmem_write(mem_addr, mem_din, mem_wmask);
-    end
-  end
-  else begin
-    mem_dout = 32'd0;
-  end
-end
+    .gpr_en_o(gpr_wen_XU_o),
+    .gpr_din_o(gpr_din_XU_o),
 
-assign mem_addr = imm_add_rs1_32b;
-assign mem_addr_26b = mem_addr[25:0];
-assign is_VGA = (| imm_add_rs1_32b[31:29]); // addr > 0x2000_0000
-assign is_MEM = ~is_VGA;
-assign mem_wen = is_MEM & (op_sw | op_sb);
-assign mem_wen = is_MEM & (op_sw | op_sb);
-assign mem_ren = is_MEM & (op_lw | op_lbu);
-assign byte_en3 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b11);
-assign byte_en2 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b10);
-assign byte_en1 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b01);
-assign byte_en0 = op_sw | op_lw | ((op_lbu | op_sb) & mem_addr_26b[1:0] == 2'b00);
-assign mem_din_byte8 = rs2_out[7:0];
-assign mem_din_byte8_ext32b =     (mem_addr_26b[1:0] == 2'b11) ? {mem_din_byte8, 24'b0}
-                                : (mem_addr_26b[1:0] == 2'b10) ? {8'b0, mem_din_byte8, 16'b0}
-                                : (mem_addr_26b[1:0] == 2'b01) ? {16'b0, mem_din_byte8, 8'b0}
-                                : {24'b0, mem_din_byte8};
-assign mem_din = op_sb ? mem_din_byte8_ext32b : rs2_out;
-assign mem_dout_byte8 =   (mem_addr_26b[1:0] == 2'b11) ? mem_dout[24+:8]
-                        : (mem_addr_26b[1:0] == 2'b10) ? mem_dout[16+:8]
-                        : (mem_addr_26b[1:0] == 2'b01) ? mem_dout[ 8+:8]
-                        : mem_dout[0+:8];
-assign mem_dout_byte8_ext32b = {24'b0, mem_dout_byte8};
-assign mem_out_val = op_lbu ? mem_dout_byte8_ext32b : mem_dout;
+    .mem_addr(mem_addr),
+    .mem_din(mem_din),
+    .mem_wen(mem_wen),
+    .mem_ren(mem_ren),
+    .byte_en_4b(byte_en_4b), 
 
-//? Instrucions
-// assign instruct = rom_PC[PC_N];
-assign imm_20b  = instruct[31:12];
-assign imm_12b  = instruct[31:20];
-assign imm_7b   = instruct[31:25];
-assign rs2      = instruct[24:20];
-assign rs1      = instruct[19:15];
-assign funct3   = instruct[14:12];
-assign rd       = instruct[11:7];
-assign imm_5b   = instruct[11:7];
-assign opcode   = instruct[6:0];
+    .PC(PC),
+    .next_PC(next_PC),
 
-assign op_addi  = (opcode == 7'h13);
-assign op_add   = (opcode == 7'h33);
-assign op_lui   = (opcode == 7'h37);
-assign op_lw    = (opcode == 7'h03 && funct3 == 3'h2);
-assign op_lbu   = (opcode == 7'h03 && funct3 == 3'h4);
-assign op_sw    = (opcode == 7'h23 && funct3 == 3'h2);
-assign op_sb    = (opcode == 7'h23 && funct3 == 3'h0);
-assign op_jalr  = (opcode == 7'h67);
+    //// debug
+    .imm_ext_32b_s(imm_ext_32b_s),
+    .mem_din_byte8(mem_din_byte8)
+);
 
-assign imm_ext_32b_s = (op_sw | op_sb) 
-                        ? {{20{imm_7b[6]}}, {imm_7b, imm_5b}} 
-                        : {{20{imm_12b[11]}}, imm_12b};
-assign imm_add_rs1_32b = imm_ext_32b_s + rs1_out;
-assign imm_add_rs1_26b = imm_add_rs1_32b[25:0];
 
-//? ALU add & addi
-assign ALU_add_t1 = rs1_out;
-assign ALU_add_t2 = op_add ? rs2_out : imm_ext_32b_s;
-assign ALU_add_sum = ALU_add_t1 + ALU_add_t2;
+//? SU
+L4_SU i_L4_SU(
+    .clk(clk),
+    .rst(rst),
+
+    .op_lw(op_lw), .op_lbu(op_lbu),
+    .mem_addr(mem_addr),
+    .mem_din(mem_din),
+    .mem_wen(mem_wen),
+    .mem_ren(mem_ren),
+    .byte_en_4b(byte_en_4b), 
+
+    .gpr_din_i(gpr_din_XU_o),
+    .gpr_din_o(gpr_din), 
+
+    .mem_out_val(mem_out_val),
+
+    //// debug
+    .mem_dout_byte8(mem_dout_byte8)
+);
+
+
+//? BU
+L5_BU i_L5_BU(
+   .clk(clk), 
+   .rst(rst),
+
+   .gpr_en_i(gpr_wen_XU_o),
+   .gpr_din_i(gpr_din_SU_o), 
+   .gpr_en_o(gpr_wen),
+   .gpr_din_o(gpr_din_BU_o), 
+
+   .PC(PC),
+   .next_PC(next_PC)
+);
+
 
 
 ////----------- Debug ------------////
@@ -258,16 +216,8 @@ always@(posedge clk or posedge sys_rst) begin
     else cnt_clk <= cnt_clk + 24'd1;
 end
 
-wire [15:0] PC_N_w1 = PC_N / 10 % 10;
-wire [15:0] PC_N_w0 = PC_N % 10;
-bcd7seg_AF ins_seg7(.b( PC_N_w1[3:0] ), .h(seg7), .en( 1'b1 ));
-bcd7seg_AF ins_seg6(.b( PC_N_w0[3:0] ), .h(seg6), .en( 1'b1 ));
-bcd7seg_AF ins_seg5(.b( 4'd0 ), .h(seg5), .en( 1'd0 ));
-bcd7seg_AF ins_seg4(.b( 4'd0 ), .h(seg4), .en( 1'd0 ));
-bcd7seg_AF ins_seg3(.b( 4'd0 ), .h(seg3), .en( 1'd0 ));
-bcd7seg_AF ins_seg2(.b( 4'd0 ), .h(seg2), .en( 1'd0 ));
-bcd7seg_AF ins_seg1(.b( 4'd0 ), .h(seg1), .en( 1'b0 ));
-bcd7seg_AF ins_seg0(.b( 4'd0 ), .h(seg0), .en( 1'b0 ));
+wire [15:0] PC_N;
+assign PC_N = PC[17:2];
 
 localparam PC_TRACE_MAX = 'h1b0;
 localparam PC_N_TRACE_MAX = 200;
@@ -356,3 +306,12 @@ always@(posedge clk) begin
 end
 
 endmodule
+
+
+
+
+
+
+
+
+

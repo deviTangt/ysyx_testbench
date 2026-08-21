@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   int cnt_loop = 0;
   while (1) {
     // nvboard_update();
-    top->instruct = PC_ROM[top->PC_N_o];
+    top->instruct_i = PC_ROM[top->PC_N_o];
     single_cycle();
 
     #if WAVE_TRACE
