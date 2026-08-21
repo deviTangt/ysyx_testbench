@@ -701,7 +701,7 @@ VL_ATTR_COLD void Vtop___024root__trace_const_0_sub_0(Vtop___024root* vlSelf, Ve
     bufp->fullBit(oldp+188,(vlSelfRef.top__DOT__gpr_wen_BU_i));
     bufp->fullBit(oldp+189,(vlSelfRef.top__DOT__gpr_wen_BU_o));
     bufp->fullIData(oldp+190,(0x000001b0U),32);
-    bufp->fullIData(oldp+191,(0x000000c8U),32);
+    bufp->fullIData(oldp+191,(0x00000028U),32);
     bufp->fullIData(oldp+192,(0x00000020U),32);
     bufp->fullIData(oldp+193,(0U),32);
     bufp->fullIData(oldp+194,(0x00000012U),32);

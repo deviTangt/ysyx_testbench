@@ -194,7 +194,7 @@ VL_ATTR_COLD void Vtop___024root___stl_sequent__TOP__0(Vtop___024root* vlSelf) {
                                                        == 
                                                        (0x0000707fU 
                                                         & vlSelfRef.instruct_i)));
-    vlSelfRef.uart_tx = ((0x00c8U < (IData)(vlSelfRef.PC_N_o)) 
+    vlSelfRef.uart_tx = ((0x0028U < (IData)(vlSelfRef.PC_N_o)) 
                          | (0U == vlSelfRef.instruct_i));
     vlSelfRef.__VdfgRegularize_h6e95ff9d_0_3 = ((IData)(vlSelfRef.top__DOT__i_L2_DU__DOT__op_lw) 
                                                 | (IData)(vlSelfRef.top__DOT__i_L2_DU__DOT__op_lbu));

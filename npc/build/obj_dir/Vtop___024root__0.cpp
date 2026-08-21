@@ -50,7 +50,7 @@ void Vtop___024root___ico_sequent__TOP__0(Vtop___024root* vlSelf) {
     Vtop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Body
-    vlSelfRef.uart_tx = ((0x00c8U < (IData)(vlSelfRef.PC_N_o)) 
+    vlSelfRef.uart_tx = ((0x0028U < (IData)(vlSelfRef.PC_N_o)) 
                          | (0U == vlSelfRef.instruct_i));
     vlSelfRef.__VdfgRegularize_h6e95ff9d_0_0 = (0x000000ffU 
                                                 & vlSelfRef.top__DOT__i_L2_DU__DOT__i_GPR__DOT__GPR
@@ -833,7 +833,7 @@ void Vtop___024root___nba_sequent__TOP__1(Vtop___024root* vlSelf) {
                                       (vlSelfRef.instruct_i 
                                        >> 0x0000000fU))] 
                                     + vlSelfRef.top__DOT__imm_ext_32b_s);
-    vlSelfRef.uart_tx = ((0x00c8U < (IData)(vlSelfRef.PC_N_o)) 
+    vlSelfRef.uart_tx = ((0x0028U < (IData)(vlSelfRef.PC_N_o)) 
                          | (0U == vlSelfRef.instruct_i));
     vlSelfRef.top__DOT____Vcellout__r_btn3____pinNumber4 
         = ((IData)(vlSelfRef.top__DOT__i_L2_DU__DOT__rst)

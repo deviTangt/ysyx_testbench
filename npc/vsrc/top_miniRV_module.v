@@ -220,7 +220,7 @@ wire [15:0] PC_N;
 assign PC_N = PC[17:2];
 
 localparam PC_TRACE_MAX = 'h1b0;
-localparam PC_N_TRACE_MAX = 200;
+localparam PC_N_TRACE_MAX = 40;
 wire work_fin;
 assign work_fin = (( 0 ) ? PC_N > PC_TRACE_MAX / 4 : PC_N > PC_N_TRACE_MAX) | (instruct == 32'h0);
 assign uart_tx = work_fin; 
