@@ -21,8 +21,8 @@ module L3_XU(
   output  wire         mem_ren,
   output  wire  [3:0]  byte_en_4b, 
 
-  input  wire [17:0] PC,
-  output wire [17:0] next_PC,
+  input  wire [31:0] PC,
+  output wire [31:0] next_PC,
 
   //// debug
   output wire [31:0] imm_ext_32b_s,
@@ -50,9 +50,8 @@ wire byte_en3, byte_en2, byte_en1, byte_en0;
 wire [31:0] mem_din_byte8_ext32b;
 
 //? PC
-wire [17:0] next_PC_norm;
-wire [17:0] next_PC_jalr;
-wire [31:0] next_PC_jalr_ext32b_s;
+wire [31:0] next_PC_norm;
+wire [31:0] next_PC_jalr;
 
 ////----------- Logic ------------////
 //? ALU
@@ -71,7 +70,7 @@ assign lui_setval = {imm_20b, 12'b0};
 //? GPR
 assign gpr_en_o  =   op_add | op_addi | op_lui | op_lw | op_lbu | op_jalr;
 assign gpr_din_o =  (op_lui) ? lui_setval
-                  : (op_jalr) ? next_PC_jalr_ext32b_s
+                  : (op_jalr) ? next_PC_jalr
                   : ALU_add_sum;
 //? MEM
 assign mem_addr = imm_add_rs1_32b;
@@ -95,10 +94,9 @@ assign mem_din = op_sb ? mem_din_byte8_ext32b : rs2_out;
 
 //? PC
 assign next_PC = (op_jalr) ? next_PC_jalr : next_PC_norm;
-assign next_PC_norm = PC + 18'd4;
+assign next_PC_norm = PC + 32'd4;
 
-assign next_PC_jalr = {imm_add_rs1_26b[17:1], 1'b0};
-assign next_PC_jalr_ext32b_s = {{14{next_PC_jalr[17]}}, next_PC_jalr};
+assign next_PC_jalr = {imm_add_rs1_32b[31:1], 1'b0};
 
 
 endmodule

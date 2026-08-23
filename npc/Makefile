@@ -1,8 +1,8 @@
 # define variables
 TOPNAME = top
 NXDC_FILES = constr/top.nxdc
-INC_PATH = ./cinc
-INC_PATH += ./csrc
+INC_PATH = $(abspath ./cinc)
+INC_PATH += $(abspath ./csrc)
 
 VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc  \

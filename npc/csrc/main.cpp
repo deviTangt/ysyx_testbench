@@ -12,12 +12,18 @@ static void reset(int n);
 extern "C" int pmem_read(int raddr);
 extern "C" void pmem_write(int waddr, int wdata, char wmask);
 
-
-#define PC_ROM_SIZE ( 2^10 ) //? 1K * 4B 
+#define KB * 1024
+#define MB * 1024 * 1024
+ //? 1K * 4B 
+#define PC_ROM_SIZE ( 4 KB )
 uint32_t PC_ROM[PC_ROM_SIZE];
+#define PC_START_POS 0x80000000
 
-#define MEM_SIZE ( 2^15 ) //? 128MB = 32K * 4B 
+//? 128MB = 32M * 4B 
+#define MEM_SIZE ( 128 MB ) 
 int32_t MEM_RAM[MEM_SIZE];
+
+const char *rom_load_path = "../am-kernels/tests/cpu-tests/build/dummy-minirv-npc.bin"; // "_res/test_diag.hex";
 
 //! main
 int main(int argc, char** argv) {
@@ -33,8 +39,12 @@ int main(int argc, char** argv) {
   reset(10);
 
   //? read pc instructions from file(s)
-  int ret = load_pc_rom_plain("resource/test_diag.hex", PC_ROM, PC_ROM_SIZE);
+  //int ret = load_pc_rom_plain(rom_load_path, PC_ROM, PC_ROM_SIZE);
+  int ret = load_pc_rom_bin(rom_load_path, PC_ROM, PC_ROM_SIZE);
+
   if(ret == 0) printf("load ok, PC_ROM[0] = 0x%08X, PC_ROM[1] = 0x%08X\n", PC_ROM[0], PC_ROM[1]);
+  else if (ret == -1) printf("load %s err!!!!!\r\n", rom_load_path);
+  else                printf("idx >= ROM_SIZE out of range%d err!!!!!\r\n", PC_ROM_SIZE);
   
   // 开启波形记录
   #if WAVE_TRACE
@@ -48,7 +58,7 @@ int main(int argc, char** argv) {
   int cnt_loop = 0;
   while (1) {
     // nvboard_update();
-    top->instruct_i = PC_ROM[top->PC_N_o];
+    top->instruct_i = PC_ROM[(top->PC_N_o - PC_START_POS) & 0x000003ff];
     single_cycle();
 
     #if WAVE_TRACE
@@ -92,14 +102,14 @@ static void reset(int n) {
 //? EXTERN "C" Read and Write
 extern "C" int pmem_read(int raddr) {
   // 总是读取地址为`raddr & ~0x3u`的4字节返回
-  uint32_t addr_n = ((raddr & 0x3u) >> 2) & 0xffffff;
+  uint32_t addr_n = ((raddr & 0x3u) >> 2) & 0x01ffffff;
   return MEM_RAM[addr_n];
 }
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   // 总是往地址为`waddr & ~0x3u`的4字节按写掩码`wmask`写入`wdata`
   // `wmask`中每比特表示`wdata`中1个字节的掩码,
   // 如`wmask = 0x3`代表只写入最低2个字节, 内存中的其它字节保持不变
-  uint32_t addr_n = ((waddr & 0x3u) >> 2) & 0xffffff;
+  uint32_t addr_n = ((waddr & 0x3u) >> 2) & 0x01ffffff;
   int32_t orgin_val = MEM_RAM[addr_n];
   MEM_RAM[addr_n] = (orgin_val & ~wmask) | wdata;
 }

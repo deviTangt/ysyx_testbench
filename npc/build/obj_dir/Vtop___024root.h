@@ -46,10 +46,13 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         CData/*0:0*/ top__DOT__gpr_wen_BU_i;
         CData/*0:0*/ top__DOT__gpr_wen_BU_o;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__rst;
+        CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_add;
+        CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_addi;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_lw;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_lbu;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_sw;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_sb;
+        CData/*0:0*/ top__DOT__i_L2_DU__DOT__op_jalr;
         CData/*0:0*/ top__DOT__i_L2_DU__DOT__wen;
         CData/*0:0*/ top__DOT__i_L4_SU__DOT__mem_wen;
         CData/*7:0*/ top__DOT__i_L4_SU__DOT__mem_dout_byte8;
@@ -74,14 +77,14 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         CData/*0:0*/ __VnbaPhaseResult;
         VL_IN16(sw,15,0);
         VL_OUT16(ledr,15,0);
-        VL_OUT16(PC_N_o,15,0);
         SData/*15:0*/ __Vtrigprevexpr___TOP__sw__0;
         VL_IN(instruct_i,31,0);
-        IData/*17:0*/ top__DOT__PC;
-        IData/*31:0*/ top__DOT__gpr_din_SU_o;
-        IData/*23:0*/ top__DOT__cnt_clk;
+        VL_OUT(PC_N_o,29,0);
     };
     struct {
+        IData/*31:0*/ top__DOT__PC;
+        IData/*31:0*/ top__DOT__gpr_din_SU_o;
+        IData/*23:0*/ top__DOT__cnt_clk;
         IData/*31:0*/ top__DOT__i_L2_DU__DOT__wdata;
         IData/*31:0*/ top__DOT__i_L2_DU__DOT__i_GPR__DOT____Vcellout__foor_loop_i__BRA__0__KET____DOT__R____pinNumber4;
         IData/*31:0*/ top__DOT__i_L2_DU__DOT__i_GPR__DOT____Vcellout__foor_loop_i__BRA__1__KET____DOT__R____pinNumber4;
@@ -119,7 +122,7 @@ class alignas(VL_CACHE_LINE_BYTES) Vtop___024root final {
         IData/*31:0*/ top__DOT__i_L4_SU__DOT__mem_din;
         IData/*31:0*/ top__DOT__i_L4_SU__DOT__mem_out_val;
         IData/*31:0*/ top__DOT__i_L4_SU__DOT__mem_dout;
-        IData/*17:0*/ top__DOT__i_L3_XU__DOT__next_PC;
+        IData/*31:0*/ top__DOT__i_L3_XU__DOT__next_PC;
         IData/*31:0*/ top__DOT__i_L3_XU__DOT__imm_ext_32b_s;
         IData/*31:0*/ __Vfunc_top__DOT__i_L4_SU__DOT__pmem_read__0__Vfuncout;
         IData/*31:0*/ __Vtrigprevexpr___TOP__instruct_i__0;

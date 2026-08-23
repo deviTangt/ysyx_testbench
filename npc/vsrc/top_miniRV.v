@@ -31,7 +31,7 @@ module top(
     output wire [7:0]   seg7,
 
     input  wire [31:0]  instruct_i,
-    output wire [15:0]  PC_N_o
+    output wire [29:0]  PC_N_o
 );
 
 ////----------- Parameters ------------////
@@ -50,7 +50,7 @@ assign sys_clk = clk;
 assign sys_rst = sw[15] | rst;
 
 //? IFU
-reg  [17:0] PC;
+reg  [31:0] PC;
 
 //? DU
 wire [31:0] instruct;
@@ -80,7 +80,7 @@ wire         mem_wen;
 wire         mem_ren;
 wire  [3:0]  byte_en_4b; 
 
-wire [17:0] next_PC;
+wire [31:0] next_PC;
 
 wire gpr_wen_XU_o;
 wire [31:0] gpr_din_XU_o;
@@ -114,7 +114,6 @@ L1_IFU i_L1_IFU(
     .instruct_i(instruct_i),
     .PC_N_o(PC_N_o)
 );
-assign PC_N = PC[17:2];
 
 //? DU
 L2_DU i_L2_DU(
@@ -216,13 +215,15 @@ always@(posedge clk or posedge sys_rst) begin
     else cnt_clk <= cnt_clk + 24'd1;
 end
 
-wire [15:0] PC_N;
-assign PC_N = PC[17:2];
+wire [29:0] PC_N;
+assign PC_N = {4'b0, PC[27:2]};
 
 localparam PC_TRACE_MAX = 'h1b0;
-localparam PC_N_TRACE_MAX = 40;
+localparam CNT_CLK_TRACE_MAX = 20;
 wire work_fin;
-assign work_fin = (( 0 ) ? PC_N > PC_TRACE_MAX / 4 : PC_N > PC_N_TRACE_MAX) | (instruct == 32'h0);
+wire e_break;
+assign e_break = (instruct == 32'h00100073);
+assign work_fin = (( 0 ) ? PC_N > PC_TRACE_MAX / 4 : cnt_clk > CNT_CLK_TRACE_MAX) | e_break;
 assign uart_tx = work_fin; 
 
 wire signed [31:0] gpr_din_ss = gpr_din;
@@ -231,71 +232,74 @@ wire signed [31:0] imm_ext_32b_ss = imm_ext_32b_s;
 always@(posedge sys_clk) begin
     if (~work_fin && ~sys_rst) begin
         if (op_add) begin
-            $display("%03d-%3x %08h  | add  rd  ,rs1,rs2"
+            $display("%03d-%8x %08h  | add  rd  ,rs1,rs2"
                     ,PC_N, PC, instruct); 
-            $display("%03s %3s %08s  - add  r%-2d ,r%-2d,r%-2d     {r%-2d -> 0x%h = r%-2d[0x%h] + r%-2d[0x%h]}"
+            $display("%03s %8s %08s  - add  r%-2d ,r%-2d,r%-2d     {r%-2d -> 0x%h = r%-2d[0x%h] + r%-2d[0x%h]}"
                 , "", "", "", rd, rs1, rs2, rd, gpr_din, rs1, rs1_out, rs2, rs2_out);
        
         end else if (op_addi) begin
-            $display("%03d-%3x %08h  | addi rd , rs1,imm"
+            $display("%03d-%8x %08h  | addi rd , rs1,imm"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - addi r%-2d, r%-2d,0x%3h   {r%-2d -> 0x%h or %d}"
+            $display("%03s %8s %08s  - addi r%-2d, r%-2d,0x%3h   {r%-2d -> 0x%h or %d}"
                 , "", "", "", rd, rs1, imm_12b, rd, gpr_din, gpr_din_ss);
 
             // $display("ALU_add_t1:%h, ALU_add_t2:%h"
             //     ,ALU_add_t1, ALU_add_t2);
 
         end else if (op_lui) begin
-            $display("%03d-%3x %08h  | lui  rd , imm"
+            $display("%03d-%8x %08h  | lui  rd , imm"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - lui  r%-2d, %5h       {r%-2d -> 0x%h}"
+            $display("%03s %8s %08s  - lui  r%-2d, %5h       {r%-2d -> 0x%h}"
                 , "", "", "", rd, imm_20b, rd, gpr_din);
 
         end else if (op_lw) begin
-            $display("%03d-%3x %08h  | lw   rd , offset(rs1)"
+            $display("%03d-%8x %08h  | lw   rd , offset(rs1)"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - lw   r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
+            $display("%03s %8s %08s  - lw   r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
                 , "", "", "", rd, imm_ext_32b_ss, rs1, rs1_out, mem_out_val);
         
         end else if (op_lbu) begin
-            $display("%03d-%3x %08h  | lbu  rd , offset(rs1)"
+            $display("%03d-%8x %08h  | lbu  rd , offset(rs1)"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - lbu  r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
+            $display("%03s %8s %08s  - lbu  r%-2d, %6d(r%-2d) {r%-2d -> 0x%h}"
                 , "", "", "", rd, imm_ext_32b_ss, rs1, rd, mem_dout_byte8);
         
             // $display("mem_addr:%h, mem_dout:%h, mem_out_val:%h"
             //     ,mem_addr, mem_dout, mem_out_val);
 
         end else if (op_sw) begin
-            $display("%03d-%3x %08h  | sw   rs2, offset(rs1)"
+            $display("%03d-%8x %08h  | sw   rs2, offset(rs1)"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - sw   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
+            $display("%03s %8s %08s  - sw   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
                 , "", "", "", rs2, imm_ext_32b_ss, rs1, mem_addr, mem_din);
         
         end else if (op_sb) begin
-            $display("%03d-%3x %08h  | sb   rs2, offset(rs1)"
+            $display("%03d-%8x %08h  | sb   rs2, offset(rs1)"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - sb   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
+            $display("%03s %8s %08s  - sb   r%-2d, %6d(r%-2d) {M[0x%4h] -> 0x%h}"
                 , "", "", "", rs2, imm_ext_32b_ss, rs1, mem_addr, mem_din_byte8);
         
             // $display("mem_addr:%h, mem_din_byte8:%h"
             //     ,mem_addr, mem_din_byte8);
 
         end else if (op_jalr) begin
-            $display("%03d-%3x %08h  | jalr rd , offset(rs1)"
+            $display("%03d-%8x %08h  | jalr rd , offset(rs1)"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - jalr r%-2d, %6d(r%2d) {r%1d -> 0x%h | PC -> %3h}"
-                , "", "", "", rd, imm_12b, rs1, rd, gpr_din, next_PC);
+            $display("%03s %8s %08s  - jalr r%-2d, %6d(r%2d) {PC -> %3h | r%1d -> 0x%h}"
+                , "", "", "", rd, imm_12b, rs1, next_PC, rd, gpr_din);
         
             // $display("next_PC:%h, next_PC_jalr:%h, next_PC_jalr_ext32b_s:%h"
             //     ,next_PC, next_PC_jalr, next_PC_jalr_ext32b_s);
 
         end else begin
-            $display("%03d-%3x %08h  | Instruction err!!!"
+            $display("%03d-%8x %08h  | * Instruction Not Found *"
                     ,PC_N, PC, instruct);
-            $display("%03s %3s %08s  - funct3=%1d opcode=%2h"
-                , "", "", "", funct3, opcode);
+            $display("%03s %8s %08s  - opcode = 0x%2h funct3 = 0b%03b" 
+                , "", "", "", opcode, funct3);
         end
+    end else if (e_break) begin
+        $display("%03d-%8x %08h  | e-break"
+                    , PC_N, PC, instruct);
     end
 end
 

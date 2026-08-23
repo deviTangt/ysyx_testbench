@@ -67,13 +67,13 @@ assign rd       = instruct[11:7];
 assign imm_5b   = instruct[11:7];
 assign opcode   = instruct[6:0];
 
-assign op_addi  = (opcode == 7'h13);
-assign op_add   = (opcode == 7'h33);
+assign op_addi  = (opcode == 7'h13 && funct3 == 3'b000);
+assign op_add   = (opcode == 7'h33 && funct3 == 3'b000);
 assign op_lui   = (opcode == 7'h37);
-assign op_lw    = (opcode == 7'h03 && funct3 == 3'h2);
-assign op_lbu   = (opcode == 7'h03 && funct3 == 3'h4);
-assign op_sw    = (opcode == 7'h23 && funct3 == 3'h2);
-assign op_sb    = (opcode == 7'h23 && funct3 == 3'h0);
-assign op_jalr  = (opcode == 7'h67);
+assign op_lw    = (opcode == 7'h03 && funct3 == 3'b010);
+assign op_lbu   = (opcode == 7'h03 && funct3 == 3'b100);
+assign op_sw    = (opcode == 7'h23 && funct3 == 3'b010);
+assign op_sb    = (opcode == 7'h23 && funct3 == 3'b000);
+assign op_jalr  = (opcode == 7'h67 && funct3 == 3'b000);
 
 endmodule
