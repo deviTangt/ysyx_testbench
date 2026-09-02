@@ -22,7 +22,7 @@ uint32_t PC_ROM[PC_ROM_SIZE];
 //? 128MB = 32M * 4B 
 #define MEM_SIZE ( 128 MB ) 
 int32_t MEM_RAM[MEM_SIZE];
-
+vr
 const char *rom_load_path = "../am-kernels/tests/cpu-tests/build/dummy-minirv-npc.bin"; // "_res/test_diag.hex";
 
 //! main
@@ -35,9 +35,9 @@ int main(int argc, char** argv) {
   printf("\r\nHello, ysyx!\r\n");
   // nvboard_bind_all_pins(top);
   // nvboard_init(0);
-
+sadasd
   reset(10);
-
+sdsd
   //? read pc instructions from file(s)
   //int ret = load_pc_rom_plain(rom_load_path, PC_ROM, PC_ROM_SIZE);
   int ret = load_pc_rom_bin(rom_load_path, PC_ROM, PC_ROM_SIZE);
@@ -114,3 +114,6 @@ extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   MEM_RAM[addr_n] = (orgin_val & ~wmask) | wdata;
 }
 
+sa
+
+c
