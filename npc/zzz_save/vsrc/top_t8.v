@@ -68,7 +68,7 @@ reg [23:0] vga_mem [524287:0];
 assign {VGA_R, VGA_G, VGA_B} = pxy_valid ? vga_mem[rgb_addr] : 24'd0;
 
 initial begin
-    $readmemh("resource/picture.hex", vga_mem);
+    $readmemh("_res/picture.hex", vga_mem);
 end
 
 

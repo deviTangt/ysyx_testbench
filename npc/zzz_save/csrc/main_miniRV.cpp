@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
   top = new Vtop{contextp};
 
   printf("\r\nHello, ysyx!\r\n");
-  // nvboard_bind_all_pins(top);
-  // nvboard_init(0);
+  nvboard_bind_all_pins(top);
+  nvboard_init(0);
 
   reset(10);
   
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
   
   int cnt_loop = 0;
   while (1) {
-    // nvboard_update();
+    nvboard_update();
     single_cycle();
 
     #if WAVE_TRACE
