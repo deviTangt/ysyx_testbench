@@ -13,6 +13,13 @@ extern "C" {
 //#define __NATIVE_USE_KLIB__
 
 // string.h
+#ifdef strchr
+#undef strchr
+#endif
+#ifdef strrchr
+#undef strrchr
+#endif
+
 void  *memset    (void *s, int c, size_t n);
 void  *memcpy    (void *dst, const void *src, size_t n);
 void  *memmove   (void *dst, const void *src, size_t n);
